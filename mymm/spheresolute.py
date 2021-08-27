@@ -16,7 +16,7 @@ def get_random_points_on_sphere(radius, numpoints):
 def create_sphere_of_atoms(radius, density = 0.25, origin = [0.0, 0.0, 0.0], segid = "S"):
     newsphere = mymm.Molecule()
     if radius < 2:
-        print "Error: addSphereOfAtoms only works for radius > 2!\n"
+        print("Error: addSphereOfAtoms only works for radius > 2!\n")
         return newsphere
 
     atomid = "CA"
@@ -27,7 +27,7 @@ def create_sphere_of_atoms(radius, density = 0.25, origin = [0.0, 0.0, 0.0], seg
     while radius_for_atom_set >= 2.0:
         surface_area = 4.0 * math.pi * radius_for_atom_set**2
         num_points = int(surface_area * density)
-        print "radius = %f, num_points =  %d\n" % (radius_for_atom_set, num_points)
+        print("radius = %f, num_points =  %d\n" % (radius_for_atom_set, num_points))
         points = get_random_points_on_sphere(radius_for_atom_set,num_points)
         for curpoint in points:
             newsphere.add_atom(mymm.Atom(number, atomid, resid, segid,

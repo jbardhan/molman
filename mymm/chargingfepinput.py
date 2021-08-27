@@ -48,7 +48,7 @@ class ChargingFepInput:
         self.segments = {} 
         for pdb in pdb_list:
             tmp = eval(pdb)
-            for key,val in tmp.iteritems():
+            for key,val in tmp.items():
                 self.segments[key] = val
         
         logging.basicConfig(filename=self.log_file, level=self.log_level)

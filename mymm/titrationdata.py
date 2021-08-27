@@ -22,13 +22,13 @@ class TitrationData:
             if len(line_data) == 0:
                 continue
     
-            if line_data[0] not in self.residue_data.keys():
-                print "Error: You must define the residue first with TITR <resname> <pka> <protons>\n"
+            if line_data[0] not in list(self.residue_data.keys()):
+                print("Error: You must define the residue first with TITR <resname> <pka> <protons>\n")
                 sys.exit(2)
         #        self.residue_data[line_data[0]] = {'atoms':{},'pKa':None,'numProtonationStates':0,'protons':[]}
 
-            if line_data[1] in self.residue_data[line_data[0]]['atoms'].keys():
-                print "Duplicate atom " + line_data[1] + " in residue " + line_data[0]
+            if line_data[1] in list(self.residue_data[line_data[0]]['atoms'].keys()):
+                print("Duplicate atom " + line_data[1] + " in residue " + line_data[0])
                 sys.exit(2)
         
             last_prot_charge_index = len(line_data)-1;

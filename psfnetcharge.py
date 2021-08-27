@@ -23,5 +23,5 @@ netcharge = 0.0;
 for q in qvec:
     netcharge += q
     
-print "netcharge is " + str(netcharge)
+print("netcharge is " + str(netcharge))
 

@@ -6,7 +6,7 @@ import mymm
 def silentremove(filename):
     try:
         os.remove(filename)
-    except OSError, e:
+    except OSError as e:
         if e.errno != errno.ENOENT:
             raise
 

@@ -43,7 +43,7 @@ for atom in protein.atoms:
                 if (atom.atomid == atomdata['atomid']):
 #               if ((atom.resid == atomdata['resid']) and (atom.atomid == atomdata['atomid'])):
 
-                    print "matched resid " + atom.resid + " and atomid " + atom.atomid
+                    print("matched resid " + atom.resid + " and atomid " + atom.atomid)
                     atom.atomid = atomdata['init']
                     protein.add_atom(mymm.Atom(number=len(protein.atoms),
                                      atomid=atomdata['final'],

@@ -17,7 +17,7 @@ args = parser.parse_args(sys.argv[1:])
 protein = mymm.Molecule(PDB=args.pdb)
 protein.read_psf(filename = args.psf)
 protein.assign_charges()
-print "assigned charges!"
+print("assigned charges!")
 protein.write_apbs_pqr(filename = args.pqr)
 exit(0)
 

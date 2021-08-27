@@ -17,7 +17,7 @@ class Mutator:
             if new_residue_start is not None:
                 line_data = line.rstrip().lstrip().split()
                 current_residue = line_data[-1].upper()
-                print "Now handling residue " + current_residue
+                print("Now handling residue " + current_residue)
                 self.full_atom_lists[current_residue] = []
                 continue
 
@@ -38,7 +38,7 @@ class Mutator:
             if new_residue_start is not None:
                 line_data = line.rstrip().lstrip().split()
                 current_residue = line_data[-1].upper()
-                print "Now handling residue " + current_residue
+                print("Now handling residue " + current_residue)
                 self.residues[current_residue] = {}
                 continue
 
@@ -47,24 +47,24 @@ class Mutator:
                 continue
             
             if len(line_data) != 2: 
-                print "Error in mutator datafile " + filename + " at line " + str(line_number)
-                print "   Two atom names per line only!  You have " + str(len(line_data)) + "!"
+                print("Error in mutator datafile " + filename + " at line " + str(line_number))
+                print("   Two atom names per line only!  You have " + str(len(line_data)) + "!")
                 return
             
             self.residues[current_residue][line_data[0]] = line_data[1]
             line_number = line_number + 1
 
     def print_state(self):
-        print "Definitions loaded in mutator:"
-        print "Protonatable residues and their full (protonated) atom lists:"
+        print("Definitions loaded in mutator:")
+        print("Protonatable residues and their full (protonated) atom lists:")
         for res_name in self.full_atom_lists:
-            print res_name + ": " + " ".join(self.full_atom_lists[res_name])
-        print "\n"
-        print "Alchemical hybrid residues and the mapping between atoms:"
+            print(res_name + ": " + " ".join(self.full_atom_lists[res_name]))
+        print("\n")
+        print("Alchemical hybrid residues and the mapping between atoms:")
         for res_name in self.residues:
-            print res_name + ":"
-            for key, val in self.residues[res_name].iteritems():
-                print "\t " + key + " -- " + val
+            print(res_name + ":")
+            for key, val in self.residues[res_name].items():
+                print("\t " + key + " -- " + val)
 
     def process_molecule(self, molecule, titr_state):
         newmolecule = Molecule()
@@ -83,11 +83,11 @@ class Mutator:
     def atom_is_duplicated(self, titr_state, atom):
 #        print "residues keys is " + " ".join(self.residues.keys())
 #        print "residue " + str(atom.number) + atom.segid + str(atom.resnum) + " to become " + titr_state.segids_titrating[atom.segid][str(atom.resnum)]
-        if titr_state.segids_titrating[atom.segid][str(atom.resnum)] not in self.residues.keys():
+        if titr_state.segids_titrating[atom.segid][str(atom.resnum)] not in list(self.residues.keys()):
             return 0
 
         new_resid = titr_state.segids_titrating[atom.segid][str(atom.resnum)]
-        if atom.atomid not in self.residues[new_resid].keys():
+        if atom.atomid not in list(self.residues[new_resid].keys()):
             return 0
 
         return 1
@@ -97,7 +97,7 @@ class Mutator:
         for cur_atom in molecule.atoms:
             if titr_state.atom_is_in_titrating_group(self, cur_atom):
 #                print "Handling atom " + str(cur_atom.number)
-                if cur_atom.atomid in self.residues[cur_atom.resid].keys():
+                if cur_atom.atomid in list(self.residues[cur_atom.resid].keys()):
                     disappearing_atoms_list.append(cur_atom.number)
         return "x.number in " + str(disappearing_atoms_list)
     
@@ -105,7 +105,7 @@ class Mutator:
         appearing_atoms_list = []
         for cur_atom in molecule.atoms:
             if titr_state.atom_is_in_titrating_group(self, cur_atom):
-                if cur_atom.atomid in self.residues[cur_atom.resid].values():
+                if cur_atom.atomid in list(self.residues[cur_atom.resid].values()):
                     appearing_atoms_list.append(cur_atom.number)
         return "x.number in " + str(appearing_atoms_list)
 

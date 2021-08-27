@@ -33,10 +33,10 @@ class Atom:
                 successfully_set_radius = True
         
         # note that in the above clause, we don't just return because we might have a patch that adjusts the radius!!
-        print "segid = " + self.segid + " and resnum = " + str(self.resnum)
+        print("segid = " + self.segid + " and resnum = " + str(self.resnum))
         patch = patches.get_patch(segid = self.segid, resnum = self.resnum)
         if patch is not None:
-            print "Checking patch " + self.segid + " : " + str(self.resnum)
+            print("Checking patch " + self.segid + " : " + str(self.resnum))
             if self.atomid in radii.data["global"]:
                 self.radius = radii.data["global"][self.atomid]
                 successfully_set_radius = True
@@ -157,11 +157,11 @@ class Atom:
     
     def translate(self, vec = None, x = None, y = None, z = None):
         if (vec == None) and (x==None or y==None or z==None):
-            print "Error: translate needs either a vector or all x,y,z!\n"
+            print("Error: translate needs either a vector or all x,y,z!\n")
             sys.exit(1)
 
         if (vec != None and x != None and y != None and z != None):
-            print "Error: translate needs _either_ vec or x,y,z, but not both!\n"
+            print("Error: translate needs _either_ vec or x,y,z, but not both!\n")
             sys.exit(1)
             
         if vec != None:

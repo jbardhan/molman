@@ -9,7 +9,7 @@ class Sites:
         for line in fh:
             line_data = line.rstrip().lstrip().split()
             if len(line_data) != 2:
-                print "Error!  Sites file had a line with more than two fields: " + line
+                print("Error!  Sites file had a line with more than two fields: " + line)
                 sys.exit(1)
             (resnum, site_type) = tuple(line_data)
             self.site_data.append({'resnum':int(resnum), 'type':site_type})
@@ -17,7 +17,7 @@ class Sites:
                 self.site_types[site_type] = {}
         fh.close()
 
-        for site_type in self.site_types.keys():
+        for site_type in list(self.site_types.keys()):
             site_filename = site_type + ".st"
             fh = open(site_filename,'r')
 
@@ -30,7 +30,7 @@ class Sites:
             for line in fh:
                 line_data = line.rstrip().lstrip().split()
                 if len(line_data) != 4:
-                    print "Error! site file " + site_filename + " has a line with more than 4 fields...\n\t" + line
+                    print("Error! site file " + site_filename + " has a line with more than 4 fields...\n\t" + line)
                     sys.exit(1)
                 (resid, atomid, protonated_q, unprotonated_q) = tuple(line_data)
                 protonated_q = float(protonated_q)
@@ -41,20 +41,20 @@ class Sites:
             fh.close()
 
             if abs(total_unprotonated_charge - int(total_unprotonated_charge)) > 1e-3:
-                print "Error! Total unprotonated charge on site " + site_type + ", resid " + resid + ", is " + str(total_unprotonated_charge) + "."
+                print("Error! Total unprotonated charge on site " + site_type + ", resid " + resid + ", is " + str(total_unprotonated_charge) + ".")
                 sys.exit(1)
             if abs(total_protonated_charge - int(total_protonated_charge)) > 1e-3:
-                print "Error! Total protonated charge on site " + site_type + ", resid " + resid + ", is " + str(total_protonated_charge) + "."
+                print("Error! Total protonated charge on site " + site_type + ", resid " + resid + ", is " + str(total_protonated_charge) + ".")
                 sys.exit(1)
             if (total_protonated_charge < total_unprotonated_charge) or abs(total_protonated_charge - total_unprotonated_charge - 1.0) > 1e-3:
-                print "Error! Total protonated charge " + str(total_protonated_charge) + " is not 1.0 greater than total unprotonated charge " + str(total_unprotonated_charge)
+                print("Error! Total protonated charge " + str(total_protonated_charge) + " is not 1.0 greater than total unprotonated charge " + str(total_unprotonated_charge))
                 sys.exit(1)
 
             if abs(total_protonated_charge - 1) < 1e-3:
-                print "Site " + site_type + ", resid " + resid + " is assumed to be basic, since the total protonated charge is " + str(total_protonated_charge)
+                print("Site " + site_type + ", resid " + resid + " is assumed to be basic, since the total protonated charge is " + str(total_protonated_charge))
                 acidic = False
             else:
-                print "Site " + site_type + ", resid " + resid + " is assumed to be acidic, since the total protonated charge is " + str(total_protonated_charge)
+                print("Site " + site_type + ", resid " + resid + " is assumed to be acidic, since the total protonated charge is " + str(total_protonated_charge))
                 acidic = True
                 
             self.site_types[site_type] = {'resid':resid, 'pKa_model':pka_model, 'atoms':atom_data, 'acidic':acidic}
@@ -107,7 +107,7 @@ class Sites:
                 atom.set_charge(atom_to_match['unprot'])
 #                print "setting charge to unprotonated"
             else:
-                print "Error!  charge_state " + charge_state + " is not defined!"
+                print("Error!  charge_state " + charge_state + " is not defined!")
                 sys.exit(1)
             
            

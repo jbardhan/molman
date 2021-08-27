@@ -1,4 +1,4 @@
-from atom import *
+from .atom import *
 import re
 import math
 
@@ -8,7 +8,7 @@ class Molecule:
         self.psf   = {}
         
         if [atoms!=None, PDB!=None, AMBER_CRD!=None].count(True) != 1:
-            print "Warning: Molecule __init__ can have either atoms, PDB, or AMBER_CRD, but not more than one!\n"
+            print("Warning: Molecule __init__ can have either atoms, PDB, or AMBER_CRD, but not more than one!\n")
             return
         
         if atoms != None:
@@ -131,7 +131,7 @@ class Molecule:
         second_line = fh.readline() # num atoms
         num_atoms = int(second_line.rstrip().lstrip())
         if num_atoms < 0 or num_atoms > 100000:
-            print "Error!  num_atoms has illegal value " + str(num_atoms) + "!\n"
+            print("Error!  num_atoms has illegal value " + str(num_atoms) + "!\n")
             sys.exit(1)
 
         atom_coords = []
@@ -146,7 +146,7 @@ class Molecule:
 #        print "read_amber_crd: len(atom_coords) = " + str(len(atom_coords))
 
         if len(atom_coords) != 3 * num_atoms:
-            print "read_amber_crd: Error! len(atom_coords) != 3 * num_atoms\n"
+            print("read_amber_crd: Error! len(atom_coords) != 3 * num_atoms\n")
             sys.exit(1)
 
         for serial in range(1, num_atoms+1):
@@ -189,16 +189,16 @@ class Molecule:
                        'res_pointers':res_pointers}
         
         if False:
-            print "prmtop title = " + title
-            print "prmtop pointers = " + str(pointers)
-            print "prmtop charges = " + str(charges)
-            print "prmtop atom_names = " + str(atom_names)
-            print "prmtop masses = " + str(masses)
-            print "prmtop atom_types = " + str(atom_types)
-            print "prmtop Acoeffs = " + str(Acoeffs)
-            print "prmtop Bcoeffs = " + str(Bcoeffs)
-            print "prmtop res_labels = " + str(res_labels)
-            print "prmtop res_pointers = " + str(res_pointers)
+            print("prmtop title = " + title)
+            print("prmtop pointers = " + str(pointers))
+            print("prmtop charges = " + str(charges))
+            print("prmtop atom_names = " + str(atom_names))
+            print("prmtop masses = " + str(masses))
+            print("prmtop atom_types = " + str(atom_types))
+            print("prmtop Acoeffs = " + str(Acoeffs))
+            print("prmtop Bcoeffs = " + str(Bcoeffs))
+            print("prmtop res_labels = " + str(res_labels))
+            print("prmtop res_pointers = " + str(res_pointers))
         
     
     def read_amber_prmtop_res_pointers(self, fh):
@@ -221,10 +221,10 @@ class Molecule:
                     res_pointers += line.rstrip().lstrip().split()
                     
         else:
-            print "read_amber_prmtop_res_pointers: Error! No RESIDUE_POINTER section found!\n"
+            print("read_amber_prmtop_res_pointers: Error! No RESIDUE_POINTER section found!\n")
             sys.exit(1)
             
-        res_pointers = map(int, res_pointers)
+        res_pointers = list(map(int, res_pointers))
         return res_pointers
 
         
@@ -247,7 +247,7 @@ class Molecule:
                     line_data = line.rstrip().lstrip()
                     res_labels += [line_data[i:i+4] for i in range(0, len(line_data), 4)]
         else:
-            print "read_amber_prmtop_res_labels: Error! No RESIDUE_LABEL section found!\n"
+            print("read_amber_prmtop_res_labels: Error! No RESIDUE_LABEL section found!\n")
             sys.exit(1)
             
         return res_labels
@@ -272,10 +272,10 @@ class Molecule:
                     acoeffs += line.rstrip().lstrip().split()
                     
         else:
-            print "read_amber_prmtop_acoeffs: Error! No LENNARD_JONES_ACOEF section found!\n"
+            print("read_amber_prmtop_acoeffs: Error! No LENNARD_JONES_ACOEF section found!\n")
             sys.exit(1)
             
-        acoeffs = map(float, acoeffs)
+        acoeffs = list(map(float, acoeffs))
         return acoeffs
 
     def read_amber_prmtop_bcoeffs(self, fh):
@@ -298,10 +298,10 @@ class Molecule:
                     bcoeffs += line.rstrip().lstrip().split()
                     
         else:
-            print "read_amber_prmtop_bcoeffs: Error! No LENNARD_JONES_BCOEF section found!\n"
+            print("read_amber_prmtop_bcoeffs: Error! No LENNARD_JONES_BCOEF section found!\n")
             sys.exit(1)
             
-        bcoeffs = map(float, bcoeffs)
+        bcoeffs = list(map(float, bcoeffs))
         return bcoeffs
 
     def read_amber_prmtop_atom_types(self, fh):
@@ -324,10 +324,10 @@ class Molecule:
                     types += line.rstrip().lstrip().split()
                     
         else:
-            print "read_amber_prmtop_atom_types: Error! No ATOM_TYPE_INDEX section found!\n"
+            print("read_amber_prmtop_atom_types: Error! No ATOM_TYPE_INDEX section found!\n")
             sys.exit(1)
             
-        types = map(int, types)
+        types = list(map(int, types))
         return types
 
     def read_amber_prmtop_amber_atom_types(self, fh):
@@ -350,7 +350,7 @@ class Molecule:
                     types += line.rstrip().lstrip().split()
                     
         else:
-            print "read_amber_prmtop_atom_types: Error! No AMBER_ATOM_TYPE section found!\n"
+            print("read_amber_prmtop_atom_types: Error! No AMBER_ATOM_TYPE section found!\n")
             sys.exit(1)
 
         return types
@@ -375,10 +375,10 @@ class Molecule:
                     masses += line.rstrip().lstrip().split()
                     
         else:
-            print "read_amber_prmtop_masses: Error! No MASS section found!\n"
+            print("read_amber_prmtop_masses: Error! No MASS section found!\n")
             sys.exit(1)
             
-        masses = map(float, masses)
+        masses = list(map(float, masses))
         return masses
     
     def read_amber_prmtop_atom_names(self, fh):
@@ -401,7 +401,7 @@ class Molecule:
                     atom_names += line.rstrip().lstrip().split()
                     
         else:
-            print "read_amber_prmtop_atom_names: Error! No ATOM_NAME section found!\n"
+            print("read_amber_prmtop_atom_names: Error! No ATOM_NAME section found!\n")
             sys.exit(1)
             
         return atom_names
@@ -428,11 +428,11 @@ class Molecule:
                     charges += line_data
                     
         else:
-            print "read_amber_prmtop_charges: Error! No CHARGE section found!\n"
+            print("read_amber_prmtop_charges: Error! No CHARGE section found!\n")
             sys.exit(1)
 
         
-        charges = map(float, charges)
+        charges = list(map(float, charges))
         charges = [x/ charge_conversion for x in charges]
 #        print "charges = " + str(charges)
         return charges
@@ -450,7 +450,7 @@ class Molecule:
             title_line = fh.readline()
             title = title_line.rstrip().lstrip()
         else:
-            print "read_amber_prmtop_title: Error! No TITLE section found!\n"
+            print("read_amber_prmtop_title: Error! No TITLE section found!\n")
             sys.exit(1)
             
         return title
@@ -478,19 +478,19 @@ class Molecule:
             pointers_counts += fh.readline().rstrip().lstrip().split()
             pointers_counts += fh.readline().rstrip().lstrip().split()
         else:
-            print "read_amber_prmtop_pointers: Error! No POINTERS section found!\n"
+            print("read_amber_prmtop_pointers: Error! No POINTERS section found!\n")
             sys.exit(1)
             
         if (len(pointers_counts) != 31) and (len(pointers_counts) != 32):
-            print "Error: there should be either 31 or 32 pointers!\n"
-            print "Instead there are " + str(len(pointers_counts))
+            print("Error: there should be either 31 or 32 pointers!\n")
+            print("Instead there are " + str(len(pointers_counts)))
             sys.exit(1)
             
         if len(pointers_counts) == 31:
             pointers_keys.pop() # delete last element, NCOPY
             
-        pointers_ints = map(int, pointers_counts)
-        pointers_dictionary = dict(zip(pointers_keys, pointers_ints))
+        pointers_ints = list(map(int, pointers_counts))
+        pointers_dictionary = dict(list(zip(pointers_keys, pointers_ints)))
         return pointers_dictionary
         
     def read_crd(self, filename):
@@ -567,8 +567,8 @@ class Molecule:
                                        radius = float(r)))
 
             if len(line_data) > 11:
-                print "Error in read_pqr: PQR line has more than 11 fields..."
-                print("Guilty line is \n"+line)
+                print("Error in read_pqr: PQR line has more than 11 fields...")
+                print(("Guilty line is \n"+line))
                 sys.exit(1)
 
         fh.close()
@@ -576,10 +576,10 @@ class Molecule:
     def renumber(self):
         tree_rep_of_system = {}
         for atom in self.atoms:
-            if atom.segid not in tree_rep_of_system.keys():
+            if atom.segid not in list(tree_rep_of_system.keys()):
                 tree_rep_of_system[atom.segid] = {}
 
-            if atom.resnum not in tree_rep_of_system[atom.segid].keys():
+            if atom.resnum not in list(tree_rep_of_system[atom.segid].keys()):
                 tree_rep_of_system[atom.segid][atom.resnum] = []
 
             tree_rep_of_system[atom.segid][atom.resnum].append(atom)
@@ -593,7 +593,7 @@ class Molecule:
         
     def add_atom(self, atom):
         if atom.__class__ != Atom:
-            print "Error! Cannot add non-Atom to Molecule!\n"
+            print("Error! Cannot add non-Atom to Molecule!\n")
             sys.exit(1)
         else:
             self.atoms.append(Atom(atom.number,atom.atomid,atom.resid,atom.segid,atom.resnum,atom.absres,atom.xyz[0],atom.xyz[1],atom.xyz[2],atom.q,atom.elem,atom.tempfactor, atom.occupancy))
@@ -604,7 +604,7 @@ class Molecule:
 
     def add_molecule(self, molecule):
         if molecule.__class__ != Molecule:
-            print "Error! Cannot add non-Molecule to Molecule!\n"
+            print("Error! Cannot add non-Molecule to Molecule!\n")
             sys.exit(1)
         
         for atom in molecule.atoms:
@@ -614,7 +614,7 @@ class Molecule:
         return list(set([x.resnum for x in self.atoms if eval(selector.string)]))
 
     def select_atoms(self, selection):
-        sublist = filter(eval("lambda x: "+selection), self.atoms)
+        sublist = list(filter(eval("lambda x: "+selection), self.atoms))
         return sublist
     
     def set_segid(self, selection, newsegid):
@@ -667,7 +667,7 @@ class Molecule:
         mode = 0
         for line in fh:
             if re.search('!N', line) is not None:
-                for mode_name, mode_index in modes.iteritems():
+                for mode_name, mode_index in modes.items():
                     if re.search(mode_name, line) is not None:
                         mode = mode_index
                 continue
@@ -806,9 +806,9 @@ class Molecule:
 
     def assign_charges(self, topology=None, patches=None):
         if topology is None:
-            print 'in here!'
+            print('in here!')
             if self.psf != {}:
-                print 'in here too!'
+                print('in here too!')
                 for atom in self.atoms:
                     atom.set_q_from_psf(self.psf)
                 return
@@ -845,7 +845,7 @@ class Molecule:
             segments[atom.segid].add_atom(atom)
 
         segment_pdb_dict = {}
-        for segid, segment in segments.items():
+        for segid, segment in list(segments.items()):
             segment_pdb = output_base + segid + ".pdb"
             segment.write_pdb2(segment_pdb)
             segment_pdb_dict[segid] = {"pdb":segment_pdb,"auto":"none"}

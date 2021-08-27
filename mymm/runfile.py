@@ -48,12 +48,12 @@ class RunFile:
         return self.userBase + current
             
     def print_details(self):
-        print "RunFile:"
-        print "\tuserBase = " + self.userBase
+        print("RunFile:")
+        print("\tuserBase = " + self.userBase)
 
-        for key,val in self.calculations.iteritems():
-            print "\tname_group = " + key
-            for key2,val2 in val.iteritems():
-                print "\t\t" + key2 + ": " + " ".join(val2)
+        for key,val in self.calculations.items():
+            print("\tname_group = " + key)
+            for key2,val2 in val.items():
+                print("\t\t" + key2 + ": " + " ".join(val2))
 
     

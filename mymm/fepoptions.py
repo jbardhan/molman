@@ -23,7 +23,7 @@ class FepOptions:
         self.alch_decouple          = alch_decouple
 
         if num_total_steps_per_window < num_equil_steps_per_window:
-            print "Error! num_total_steps_per_window < num_equil_steps_per_window!\n"
+            print("Error! num_total_steps_per_window < num_equil_steps_per_window!\n")
             return
         self.alch_equil_steps           = num_equil_steps_per_window
         self.num_total_steps_per_window = num_total_steps_per_window

@@ -17,7 +17,7 @@ runfile = mymm.RunFile(filename = args.runFile, base = args.baseOut)
 runfile.print_details()
 
 
-for curCalc in runfile.calculations.keys():
+for curCalc in list(runfile.calculations.keys()):
     modifiedSystem = runfile.process(curCalc, system)
     modifiedSystem.write_crg(runfile.base_output(curCalc) + ".crg")
     modifiedSystem.write_crd(runfile.base_output(curCalc) + ".crd")

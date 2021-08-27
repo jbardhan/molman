@@ -49,7 +49,7 @@ class NamdSimulation:
     def write_namd_file(self, filename):
         fh = open(filename,'w')
 
-        for key,val in self.variables.items():
+        for key,val in list(self.variables.items()):
             fh.write("set  %s  %s\n" % (key, str(val)))
 
         for parameter_file in self.parameter_files:
@@ -58,7 +58,7 @@ class NamdSimulation:
         for source_file in self.files_to_source:
             fh.write("source  %s\n" % (source_file))
             
-        for key,val in self.parameters.items():
+        for key,val in list(self.parameters.items()):
             fh.write("%s\t\t%s\n" % (key, str(val)))
 
         for command in self.commands_to_run:
@@ -72,7 +72,7 @@ class NamdSimulation:
         
     def load_previous(self, previous_files = None):
         if previous_files is None:
-            print "Error in load_previous: you must specify outputs from previous run of NAMD!\n"
+            print("Error in load_previous: you must specify outputs from previous run of NAMD!\n")
             sys.exit(1);
 
         for parameter in ["cellBasisVector1", "cellBasisVector2", "cellBasisVector3", "cellOrigin", "temperature"]:
@@ -116,15 +116,15 @@ class NamdSimulation:
             psfgen_vmd_file.write("topology " + topology_file + "\n")
             
         mutation_commands = {} # have to do these last
-        for segment_name, segment_data in segments.items():
+        for segment_name, segment_data in list(segments.items()):
             psfgen_vmd_file.write("segment " + segment_name + " {\n")
-            for segmentKey,segmentVal in segments[segment_name].items():
+            for segmentKey,segmentVal in list(segments[segment_name].items()):
                 if re.search('mutate',segmentKey) is not None:
                     mutation_commands[segmentKey] = segmentVal
                 else:
                     psfgen_vmd_file.write("\t" + segmentKey + " " + segmentVal + "\n")
 
-            for mutKey, mutVal in mutation_commands.items():
+            for mutKey, mutVal in list(mutation_commands.items()):
                 psfgen_vmd_file.write("\t" + mutKey + " " + mutVal + "\n")
                 
             psfgen_vmd_file.write("}\n")
@@ -154,7 +154,7 @@ class NamdSimulation:
 
     # TO DO: need to verify that the script ran without problems!
     def get_default_solvation_options(self, base_filename):
-        print "get_default_solvation_options: assuming minimum %f-A padding and cubic box.\n"%(self.min_solvation_distance)
+        print("get_default_solvation_options: assuming minimum %f-A padding and cubic box.\n"%(self.min_solvation_distance))
         solute = mymm.Molecule(PDB=base_filename + ".pdb")
         boxsize, origin = solute.get_box_info()
         maxLength = max(boxsize) + 2.0 * self.min_solvation_distance
@@ -204,7 +204,7 @@ class NamdSimulation:
        
     def define_fixed_atoms(self, fixed_atoms_selector, column_selector = "B"):
         if column_selector != "B":
-            print "Error in define_fixed_atoms(): column_selector must be B for now!\n"
+            print("Error in define_fixed_atoms(): column_selector must be B for now!\n")
             return
         
         fixed_atoms = mymm.Molecule(PDB=self.get_most_recent_base(".pdb"))
@@ -226,7 +226,7 @@ class NamdSimulation:
                                   disappearing_atoms_selector = None,
                                   column_selector = "B"):
         if column_selector != "B":
-            print "Error in define_fep_atoms(): column_selector must be B for now!\n"
+            print("Error in define_fep_atoms(): column_selector must be B for now!\n")
             return
 
         self.fep_options = fep_options

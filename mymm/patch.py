@@ -11,7 +11,7 @@ class Patch:
         fh = open(filename, 'r')
         for line in fh:
             line_data = line.rstrip().lstrip().split()
-            print "length of line data is " + str(len(line_data))
+            print("length of line data is " + str(len(line_data)))
             (segid, resnum, patch) = (line_data[0],line_data[1],line_data[2])
             self.data.append({'segid':segid,'resnum':resnum,'patch':patch})
         fh.close()
@@ -26,4 +26,4 @@ class Patch:
 
     def print_patch_data(self):
         for pres in self.data:
-            print "Patch " + pres['patch'] +  " at segid " + pres['segid'] + ":" + pres['resnum'] + "."
+            print("Patch " + pres['patch'] +  " at segid " + pres['segid'] + ":" + pres['resnum'] + ".")

@@ -37,4 +37,4 @@ all_titration_states = {'JR1':['JR1','JR2','JR3','JR4'],
 
 titratable_residues = {residue: system.get_resname(residue) for residue in  all_residues if system.get_resname(residue) in list_of_titratable_residues}
 
-print "Titratable residues are: " + str(titratable_resiadues)
+print("Titratable residues are: " + str(titratable_resiadues))

@@ -30,12 +30,12 @@ class Radii:
             fh = open(filename, 'w')
             sys.stdout = fh
 
-        print "atom__res_radius_"
-        for resid, radii in self.data.iteritems():
+        print("atom__res_radius_")
+        for resid, radii in self.data.items():
             if resid == 'global':
                 resid == "   "
-            for atomid, radius in radii.iteritems():
-                print "%-6s%-4s%-8s" % (atomid, resid, radius)
+            for atomid, radius in radii.items():
+                print("%-6s%-4s%-8s" % (atomid, resid, radius))
 
         if filename is not None:
             sys.stdout = sys.__stdout__

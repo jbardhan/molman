@@ -19,7 +19,7 @@ fh = open(args.mode,'r')
 for line in fh:
     line_data = line.rstrip().lstrip().split()
     if len(line_data) != 2:
-        print "Error: need two fields per line, an index and a weight!\n"
+        print("Error: need two fields per line, an index and a weight!\n")
         
     atomNumber,atomWeight = line_data[0],line_data[1]
     protein.set_temperature_factor("x.number == " + atomNumber, float(atomWeight))
