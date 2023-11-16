@@ -16,3 +16,4 @@ from .topology import *
 from .sites import *
 from .runfile import *
 from .altmansrf import *
+from .titratable import *
