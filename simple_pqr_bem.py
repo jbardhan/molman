@@ -20,14 +20,20 @@ def write_delphi_param_file(outputfilename, details):
     f.close()
 
 
-def mesh_surface(meshmaker_bin, outputXyzr, radiiSiz, outputSrf, proberadius, sternradius, dieldens, sterndens, saltconc, prefix):
+def mesh_surface(meshmaker_bin, outputXyzr, radiiSiz, outputSrf, proberadius, sternradius, dieldens, sterndens, prefix):
 #    Usage: /home/bard415/repos/fftsvd/meshmaker2 [molecule.pdb/crd/xyzr] [radii.siz] [output.srf] [proberadius] [ionexclusionradius] [dielectricdensity] [saltdensity] [dielectriccode] [saltcode] [prefix]
-    meshmaker_command = ' '.join([meshmaker_bin, outputXyzr, radiiSiz, outputSrf, str(proberadius), str(sternradius), str(dieldens), str(sterndens), str(saltconc), "1", "1", prefix])
+    meshmaker_command = ' '.join([meshmaker_bin, outputXyzr, radiiSiz, outputSrf, str(proberadius), str(sternradius), str(dieldens), str(sterndens), "1", "1", prefix])
     print("Meshmaker command = \n")
     print("\t"+ meshmaker_command + "\n")
-#    os.system(meshmaker_command)
+    os.system(meshmaker_command)
     
-             
+
+def run_bem(solver_bin, inputPrm, radiiSiz, inputCrg, inputPdb, inputSrf, outputChargePotFile, doCoulomb01, chains, logFile):
+    bem_command = ' '.join([solver_bin, inputPrm, radiiSiz, inputCrg, inputPdb, inputSrf, outputChargePotFile, str(doCoulomb01), chains, "> "+logFile])
+    print("BEM command = \n")
+    print("\t"+bem_command+"\n")
+    os.system(bem_command)
+
 
 
 parser = argparse.ArgumentParser(description = "This program takes a .pqr file (MEAD format only for now, meaning no chain field) and writes a CRG and PDB file from it.", prog = sys.argv[0])
@@ -77,9 +83,10 @@ system.write_xyzr(outputXyzr)
 outputPrm = args.outputbase+".prm"
 write_delphi_param_file(outputfilename=outputPrm, details = args)
 
-mesh_surface("~/bin/meshmaker", outputXyzr, ntpath.basename(args.radii), "./output.srf" , args.proberad, args.stern, args.dieldens, args.sterndens, args.saltconc, "./")
+mesh_surface("~/repos/fftsvd/meshmaker", outputXyzr, ntpath.basename(args.radii), "./output.srf" , args.proberad, args.stern, args.dieldens, args.sterndens, "./")
 
-#run_bem()
+run_bem(solver_bin="~/repos/hipd3/FFTSVDpbeSRF", inputPrm=outputPrm, radiiSiz=ntpath.basename(args.radii), inputCrg=outputCrg, inputPdb=outputPdb, inputSrf="./output.srf", outputChargePotFile="", doCoulomb01=0, chains="X", logFile="bem_out.log")
+
 #process_bem_output()
 
 # copy files to outputdir
