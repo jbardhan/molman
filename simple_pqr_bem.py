@@ -29,7 +29,7 @@ def mesh_surface(meshmaker_bin, outputXyzr, radiiSiz, outputSrf, proberadius, st
     
 
 def run_bem(solver_bin, inputPrm, radiiSiz, inputCrg, inputPdb, inputSrf, outputChargePotFile, doCoulomb01, chains, logFile):
-    bem_command = ' '.join([solver_bin, inputPrm, radiiSiz, inputCrg, inputPdb, inputSrf, outputChargePotFile, str(doCoulomb01), chains, "> "+logFile])
+    bem_command = ' '.join([solver_bin, inputPrm, radiiSiz, inputCrg, inputPdb, inputSrf, str(doCoulomb01), chains, outputChargePotFile, "> "+logFile])
     print("BEM command = \n")
     print("\t"+bem_command+"\n")
     os.system(bem_command)
@@ -85,7 +85,7 @@ write_delphi_param_file(outputfilename=outputPrm, details = args)
 
 mesh_surface("~/repos/fftsvd/meshmaker", outputXyzr, ntpath.basename(args.radii), "./output.srf" , args.proberad, args.stern, args.dieldens, args.sterndens, "./")
 
-run_bem(solver_bin="~/repos/hipd3/FFTSVDpbeSRF", inputPrm=outputPrm, radiiSiz=ntpath.basename(args.radii), inputCrg=outputCrg, inputPdb=outputPdb, inputSrf="./output.srf", outputChargePotFile="", doCoulomb01=0, chains="X", logFile="bem_out.log")
+run_bem(solver_bin="~/repos/hipd3/FFTSVDpbeSRF", inputPrm=outputPrm, radiiSiz=ntpath.basename(args.radii), inputCrg=outputCrg, inputPdb=outputPdb, inputSrf="./output.srf", outputChargePotFile="reactpot.txt", doCoulomb01=0, chains="X", logFile="bem_out.log")
 
 #process_bem_output()
 
