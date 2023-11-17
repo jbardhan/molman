@@ -876,16 +876,15 @@ class Molecule:
 
     def set_group_charges(self, group_defs, residue, state):
         if residue['group'] not in group_defs.table.keys():
-            print("Termini titratable groups are not implemented yet!\n")
-            sys.exit(1)
-            
-        titratable_group_def = group_defs.table[residue['group']][residue['group']]['atom_charge_states']
+            titratable_group_def = group_defs.table['GLOBAL'][residue['group']]['atom_charge_states']
+        else:
+            titratable_group_def = group_defs.table[residue['group']][residue['group']]['atom_charge_states']
 
         selection = mymm.Selector(segids = residue['segid'], resnums=[ int(residue['resnum'])] ).string
-        print("Selection string is \""+selection+"\".\n")
+#        print("Selection string is \""+selection+"\".\n")
         sublist = self.select_atoms(selection)
         residue=mymm.Molecule(sublist)
-        residue.write_pdb2("test.pdb")
+#        residue.write_pdb2("test.pdb")
         for atom in sublist:
             charge_state_dict = {}
             if atom.atomid in titratable_group_def.keys():

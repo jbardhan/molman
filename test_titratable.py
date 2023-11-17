@@ -2,8 +2,8 @@
 import re, os, sys, subprocess, argparse, logging
 import mymm
 
-args = { 'pdb': 'arg_capped.pdb',
-         'psf': 'arg_capped.psf',
+args = { 'pdb': 'arg_capped_nter_cter_PARSE.pdb',
+         'psf': 'arg_capped_nter_cter_PARSE.psf',
          'def_file': '../titratable_PARSE.def',
          'titration_list' : 'titration_list.txt'}
 
@@ -34,5 +34,6 @@ for residue in table.list_of_residues_to_titrate:
     system.write_apbs_pqr(str(list_index)+"_0.pqr")
     system.set_titratable_group_charges(table, residue, state="charged") # charged
     system.write_crg(str(list_index)+"_1.crg")
-    system.write_apbs_pqr(str(list_index)+"_0.pqr")
+    system.write_apbs_pqr(str(list_index)+"_1.pqr")
     list_index = list_index+1
+

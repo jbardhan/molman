@@ -26,7 +26,9 @@ class Titratable:
                 current_res   = line_init_data[1]
                 current_group = line_init_data[2]
                 current_gamma = line_init_data[3]
-                self.table[current_res] = {}
+                if current_res not in self.table.keys():
+                    self.table[current_res] = {}
+
                 self.table[current_res][current_group] = {'gamma':current_gamma,
                                                           'atom_charge_states': {}}
                 self.list_of_defined_groups.append(current_group)
@@ -160,11 +162,22 @@ class Titratable:
             # if the titratable group IS a global one (terminus), do the following
             # check if all the atoms in the titratable group atom table are also present in the extracted residue.  if so, we're fine, if not, report error and die
             if residue['group'] not in self.table:
-                table_residue_name = list(self.table.keys())[list(self.table.values()).index(residue['group'])]  # this hack to get key from value is from https://stackoverflow.com/questions/8023306/get-key-by-value-in-dictionary
+                table_residue_name = 'GLOBAL'
+
+                # if we don't have all the atoms listed in the atom table, report error and die
+                atom_table_names = self.table[table_residue_name][residue['group']]['atom_charge_states'].keys()
+                flag = 1
+                if (all (atom_name in extracted_residue_atom_names for atom_name in atom_table_names)):
+                    flag = 0
+                if flag:
+                    print("Not all atoms in the titratable group are present in the extracted residue!\n")
+                    print("\tatom_table_names = " + ', '.join(atom_table_names)+"\n")
+                    print("\textracted residue atom names = " + ', '.join(extracted_residue_atom_names) + "\n")
+                    sys.exit(1)
+                    
+                ## the below doesn't work
+                ##table_residue_name =  ist(self.table.keys())[list(self.table.values()).index(residue['group'])]  # this hack to get key from value is from https://stackoverflow.com/questions/8023306/get-key-by-value-in-dictionary
                 
-                #### THIS IS WHERE WE NEED TO EDIT
-                print("Warning: Titratable termini are not currently being verified.\n")
-            
             print("... residue is okay!\n")
         print("All titratable groups verified against molecule.\n")
         
