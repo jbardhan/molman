@@ -1,6 +1,7 @@
 from .atom import *
 import re
 import math
+import mymm
 
 class Molecule:
     def __init__(self, atoms = None, PDB = None, AMBER_CRD = None):
@@ -868,4 +869,38 @@ class Molecule:
 
         for atom in self.atoms:
             atom.rotateZ(angle)
+
+    def zero_all_charges(self):
+        for atom in self.atoms:
+            atom.set_charge(0.0)
+
+    def set_group_charges(self, group_defs, residue, state):
+        if residue['group'] not in group_defs.table.keys():
+            print("Termini titratable groups are not implemented yet!\n")
+            sys.exit(1)
             
+        titratable_group_def = group_defs.table[residue['group']][residue['group']]['atom_charge_states']
+
+        selection = mymm.Selector(segids = residue['segid'], resnums=[ int(residue['resnum'])] ).string
+        print("Selection string is \""+selection+"\".\n")
+        sublist = self.select_atoms(selection)
+        residue=mymm.Molecule(sublist)
+        residue.write_pdb2("test.pdb")
+        for atom in sublist:
+            charge_state_dict = {}
+            if atom.atomid in titratable_group_def.keys():
+                charge_state_dict = {'zero':0.0,
+                                     'neutral':titratable_group_def[atom.atomid][0],
+                                     'charged':titratable_group_def[atom.atomid][1]
+                                 }
+                atom.set_charge(float(charge_state_dict[state]))
+
+
+    def set_titratable_group_charges(self, group_defs, residue=None, state=None):
+        if residue is not None:
+            self.set_group_charges(group_defs, residue, state)
+        else:
+            for residue in group_defs.list_of_residues_to_titrate:
+                self.set_group_charges(group_defs, residue, state)
+
+

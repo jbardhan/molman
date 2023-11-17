@@ -8,7 +8,7 @@ global_param_dir = os.getenv('MOLMAN_PARAMETER_DIR',os.getcwd())
 args = {'pdb':'built.pdb',
         'psf':'built.psf',
         'pqr':'built.pqr',
-        'group_defs':'titratable_groups.def',
+        'group_defs':'titratable_PARSE.def',
         'titratable_list':'titratable_list.txt',
         'patchinfo':'patchfile',
         'segids':['X'],
@@ -25,23 +25,12 @@ except:
 system = mymm.Molecule(PDB = args['pdb'])
 system.read_psf(filename = args['psf'])
 
-####
-all_residues = system.get_residues(selector = mymm.Selector(segids = args['segids']))
-titratable_groups_definitions = system.read_titration_group_defs(args['group_defs'])
+table = mymm.Titratable(filename = args['group_defs'])
 
-protein_titratable_list = system.read_groups_to_titrate(args['titratable_list'])
+titratable.read_titration_list(args['titratable_list'])
 
-#list_of_titratable_residues = ['JR1' , 'JE1', 'JD1', 'JY1', 'JK1', 'JC1', 'JH1']
-#all_titration_states = {'JR1':['JR1','JR2','JR3','JR4'],
-                        'JE1':['JE1','JE2'],
-                        'JD1':['JD1','JD2'],
-                        'JY1':['JY1','JY2'],
-                        'JK1':['JK1','JK2','JK3','JK4'],
-                        'JC1':['JC1','JC2'],
-                        'JH1':['JH1','JH2','JH3']}
-#titratable_residues = {residue: system.get_resname(residue) for residue in  all_residues if system.get_resname(residue) in list_of_titratable_residues}
+print "Titratable residues are: " + str(titratable.list_of_residues)
 
-print "Titratable residues are: " + str(titratable_resiadues)
 sys.exit(0)
 
 #####
