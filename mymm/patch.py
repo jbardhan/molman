@@ -4,7 +4,7 @@ import mymm
 # really need to make this capable of handling multi-residue patches.
 
 class Patch:
-    def __init__(self, filename):
+    def __init__(self, filename = ""):
         self.data = []
         if filename == "":
             return
@@ -13,9 +13,12 @@ class Patch:
             line_data = line.rstrip().lstrip().split()
             print("length of line data is " + str(len(line_data)))
             (segid, resnum, patch) = (line_data[0],line_data[1],line_data[2])
-            self.data.append({'segid':segid,'resnum':resnum,'patch':patch})
+            self.add_patched_site(segid, resnum, patch)
         fh.close()
 
+    def add_patched_site(self,segid, resnum, patch):
+        self.data.append({'segid':segid,'resnum':resnum,'patch':patch})
+    
     def get_patch(self, segid, resnum):
         for pres in self.data:
             if ( (pres['segid'] == segid)
