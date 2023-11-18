@@ -33,10 +33,10 @@ class Atom:
                 successfully_set_radius = True
         
         # note that in the above clause, we don't just return because we might have a patch that adjusts the radius!!
-        print("segid = " + self.segid + " and resnum = " + str(self.resnum))
+#        print("segid = " + self.segid + " and resnum = " + str(self.resnum))
         patch = patches.get_patch(segid = self.segid, resnum = self.resnum)
         if patch is not None:
-            print("Checking patch " + self.segid + " : " + str(self.resnum))
+#            print("Checking patch " + self.segid + " : " + str(self.resnum))
             if self.atomid in radii.data["global"]:
                 self.radius = radii.data["global"][self.atomid]
                 successfully_set_radius = True
