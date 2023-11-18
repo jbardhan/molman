@@ -41,7 +41,7 @@ for residue in table.list_of_residues_to_titrate:
     
     for charge_state in charge_state_hash.keys():
         site_plus_state = str(list_index) + "_" + str(charge_state)
-
+        print("*****  Doing site plus state " + site_plus_state + "\n")
         os.mkdir(site_plus_state)
         os.chdir(site_plus_state)
 
@@ -56,6 +56,6 @@ for residue in table.list_of_residues_to_titrate:
 
         os.chdir("..") # out of site_plus_state
              
-    sys.exit(1)
+#    sys.exit(1)
     list_index = list_index+1
 

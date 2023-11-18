@@ -808,9 +808,9 @@ class Molecule:
 
     def assign_charges(self, topology=None, patches=None):
         if topology is None:
-            print('in here!')
+#            print('in here!')
             if self.psf != {}:
-                print('in here too!')
+#                print('in here too!')
                 for atom in self.atoms:
                     atom.set_q_from_psf(self.psf)
                 return
@@ -960,14 +960,43 @@ class Molecule:
             f.close()
         else:
             # ELSEIF residue is global
-            print("group is " + residue['group']+".")
-            print("keys is " + ", ".join(group_defs.table.keys()))
-            print("keys keys is " + " ".join(group_defs.table[residue['group']].keys()))
-            print("error! Termini are not implemented yet")
-
-            # create selection and make sublist of atoms (could this be the same as the not global case??)
+#            print("group is " + residue['group']+".")
+#            print("keys is " + ", ".join(group_defs.table.keys()))
+#            print("keys keys is " + " ".join(group_defs.table[residue['group']].keys()))
+#            print("error! Termini are not implemented yet")
 
             # write buildvmd script using ALA and the other patch, topologyFileList and specify pdb/psf filenames
+            selection = mymm.Selector(segids = residue['segid'], resnums=[ int(residue['resnum'])] ).string
+            sublist = self.select_atoms(selection)
+            extracted_residue =mymm.Molecule(sublist)
+
+            # write pdb of sublist
+            extracted_residue.write_pdb2(bare_group_pdb)
+            
+            # write buildvmd script using topologyFileList and patches, specify pdb/psf filenames
+            f = open(build_script_vmd_file, "w")
+            f.write("mol new " + bare_group_pdb + "\n")
+            f.write("package require psfgen\n")
+            if type(topologyFileList) is str:
+                f.write("topology " + topologyFileList + "\n")
+            else:
+                for topologyFile in topologyFileList:
+                    f.write("topology " + topologyFile + "\n")
+            f.write("segment A {\n")
+            f.write("pdb " + bare_group_pdb + "\n")
+            f.write("mutate " + residue['resnum'] + " ALA \n")
+            if re.match("CTER", residue['group']) is not None:
+                f.write("first ace\n")
+            if re.match("NTER", residue['group']) is not None:
+                f.write("last ct3\n")
+            
+            f.write("}\n")
+            f.write("coordpdb " + bare_group_pdb + " A\n")
+            f.write("guesscoord\n")
+            f.write("writepsf " + capped_group + ".psf\n")
+            f.write("writepdb " +  capped_group + ".pdb\n")
+            f.write("quit\n")
+            f.close()
 
 
         # run vmd, check for warnings and errors, print both, die if errors
@@ -1001,7 +1030,7 @@ class Molecule:
 
         radii_data = mymm.Radii()
         for radii_file in radii_list:
-            print("Radii file = " + radii_file)
+#            print("Radii file = " + radii_file)
             radii_data.read_radii_file(radii_file)
         final_sys.assign_radii(radii_data, patch_data)
         
