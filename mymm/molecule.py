@@ -1,7 +1,8 @@
 from .atom import *
-import re
+import re, os
 import math
 import mymm
+import subprocess
 
 class Molecule:
     def __init__(self, atoms = None, PDB = None, AMBER_CRD = None):
@@ -903,3 +904,123 @@ class Molecule:
                 self.set_group_charges(group_defs, residue, state)
 
 
+    def build_titratable_group_model_compound(self, group_defs, residue, state, directory, topologyFileList, radii_list):
+
+        if type(radii_list) is not list:
+            radii_list = [radii_list]
+
+#        print("Radii list is " + str(radii_list))
+        
+        build_script_vmd_file = "build.vmd"
+        # store cwd
+        startingdir = os.getcwd()
+        
+        # make directory; die if exists or fails
+        try:
+            os.mkdir(directory)
+        except:
+            print("Error in making directory!")
+            
+        # change to directory
+        os.chdir(directory)
+        bare_group_pdb = "bare_group.pdb"
+        capped_group  = "capped_group"
+        
+        # IF residue is not global
+        if residue['group'] in group_defs.table.keys():
+
+            # create selection and make sublist of atoms
+            selection = mymm.Selector(segids = residue['segid'], resnums=[ int(residue['resnum'])] ).string
+            sublist = self.select_atoms(selection)
+            extracted_residue =mymm.Molecule(sublist)
+
+            # write pdb of sublist
+            extracted_residue.write_pdb2(bare_group_pdb)
+            
+            # write buildvmd script using topologyFileList and patches, specify pdb/psf filenames
+            f = open(build_script_vmd_file, "w")
+            f.write("mol new " + bare_group_pdb + "\n")
+            f.write("package require psfgen\n")
+            if type(topologyFileList) is str:
+                f.write("topology " + topologyFileList + "\n")
+            else:
+                for topologyFile in topologyFileList:
+                    f.write("topology " + topologyFile + "\n")
+            f.write("segment A {\n")
+            f.write("pdb " + bare_group_pdb + "\n")
+            f.write("first ace\n")
+            f.write("last ct3\n")
+            
+            f.write("}\n")
+            f.write("coordpdb " + bare_group_pdb + " A\n")
+            f.write("guesscoord\n")
+            f.write("writepsf " + capped_group + ".psf\n")
+            f.write("writepdb " +  capped_group + ".pdb\n")
+            f.write("quit\n")
+            f.close()
+        else:
+            # ELSEIF residue is global
+            print("group is " + residue['group']+".")
+            print("keys is " + ", ".join(group_defs.table.keys()))
+            print("keys keys is " + " ".join(group_defs.table[residue['group']].keys()))
+            print("error! Termini are not implemented yet")
+
+            # create selection and make sublist of atoms (could this be the same as the not global case??)
+
+            # write buildvmd script using ALA and the other patch, topologyFileList and specify pdb/psf filenames
+
+
+        # run vmd, check for warnings and errors, print both, die if errors
+        build_command_list = ["vmd", "-dispdev", "text", "-e", "build.vmd"]
+        output = subprocess.check_output(build_command_list, text=True)
+        vmd_output_file=open("vmd_output",'w')
+        vmd_output_file.write(output)
+        vmd_output_file.close()
+
+        [num_errors, warnings_and_errors] = self.process_VMD_output("vmd_output")
+        if len(warnings_and_errors) > 0:
+            print("There were warnings and/or errors running VMD:\n")
+            print("VMD Output: " + "VMD Output:".join(warnings_and_errors))
+        if num_errors > 0:
+            print("Dying due to errors running VMD.\n")
+
+
+        # load new molecule with PDB and PSF, assign charges,
+        # set_group_charges, write out pqr and crg.
+        final_sys = mymm.Molecule(PDB=capped_group+".pdb")
+        final_sys.read_psf(filename=capped_group+".psf")
+        final_sys.assign_charges()
+        final_sys.set_titratable_group_charges(group_defs, residue, state)
+        final_sys.write_crg(capped_group+".crg")
+
+        ## assign radii
+        #### write patchfile
+        patch_data = mymm.Patch()
+        patch_data.add_patched_site(residue['segid'],residue['resnum'],"ACE")
+        patch_data.add_patched_site(residue['segid'],residue['resnum'],"CT3")
+
+        radii_data = mymm.Radii()
+        for radii_file in radii_list:
+            print("Radii file = " + radii_file)
+            radii_data.read_radii_file(radii_file)
+        final_sys.assign_radii(radii_data, patch_data)
+        
+        final_sys.write_apbs_pqr(capped_group+".pqr")
+#        final_sys.write_pdb2(capped_group+".pdb2")
+        # chdir back to original cwd
+        os.chdir(startingdir)
+        
+    def process_VMD_output(self, filename):
+        vmd_output_file = open(filename,'r')
+        num_errors = 0
+        warnings_and_errors = []
+        for line in vmd_output_file:
+            if re.search('error', line, re.IGNORECASE) is not None:
+                warnings_and_errors.append(line)
+                num_errors = num_errors+1
+            if re.search('warning', line, re.IGNORECASE) is not None:
+                warnings_and_errors.append(line)
+                
+        vmd_output_file.close()
+        return [num_errors, warnings_and_errors]
+    
