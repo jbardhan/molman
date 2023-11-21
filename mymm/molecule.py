@@ -904,7 +904,7 @@ class Molecule:
                 self.set_group_charges(group_defs, residue, state)
 
 
-    def build_titratable_group_model_compound(self, group_defs, residue, state, directory, topologyFileList, radii_list):
+    def build_titratable_group_model_compound(self, group_defs, residue, state, topologyFileList, radii_list):
 
         if type(radii_list) is not list:
             radii_list = [radii_list]
@@ -915,14 +915,15 @@ class Molecule:
         # store cwd
         startingdir = os.getcwd()
         
-        # make directory; die if exists or fails
-        try:
-            os.mkdir(directory)
-        except:
-            print("Error in making directory!")
-            
-        # change to directory
-        os.chdir(directory)
+#        # make directory; die if exists or fails
+#        try:
+#            os.mkdir(directory)
+#        except:
+#            print("Error in making directory!")
+#            
+#        # change to directory
+#        os.chdir(directory)
+
         bare_group_pdb = "bare_group.pdb"
         capped_group  = "capped_group"
         
