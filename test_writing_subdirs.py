@@ -51,9 +51,14 @@ for residue in table.list_of_residues_to_titrate:
         system.write_crg(site_plus_state + ".crg")
         system.write_apbs_pqr(site_plus_state + ".pqr")
         os.chdir("..")
-                     
-        system.build_titratable_group_model_compound(table, residue, charge_state_hash[charge_state], "model_compound", top_file, radii_file)
 
+        os.mkdir("model_compound")
+        os.chdir("model_compound")
+        system.build_titratable_group_model_compound(table, residue, charge_state_hash[charge_state], top_file, radii_file)
+        os.chdir("..")
+
+
+        
         os.chdir("..") # out of site_plus_state
              
 #    sys.exit(1)
