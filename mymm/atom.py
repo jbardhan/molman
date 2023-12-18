@@ -30,6 +30,7 @@ class Atom:
         if self.resid in radii.data:
             if self.atomid in radii.data[self.resid]:
                 self.radius = radii.data[self.resid][self.atomid]
+#                print("atom " + str(self.atomid) + " has radius " + str(self.radius))
                 successfully_set_radius = True
         
         # note that in the above clause, we don't just return because we might have a patch that adjusts the radius!!
@@ -39,11 +40,12 @@ class Atom:
 #            print("Checking patch " + self.segid + " : " + str(self.resnum))
             if self.atomid in radii.data["global"]:
                 self.radius = radii.data["global"][self.atomid]
+#                print("atom " + str(self.atomid) + " has radius " + str(self.radius))
                 successfully_set_radius = True
 
-#        if successfully_set_radius == False:
-#            print 'Error in atom.set_radius!  Atom atomnum does not have a radius entry anywhere!\n'
-#            sys.exit(1)
+        if successfully_set_radius == False:
+            print('Error in atom.set_radius!  Atom atomnum does not have a radius entry anywhere!\n')
+            sys.exit(1)
         
     def set_charge(self, q):
         self.q = q
