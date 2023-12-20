@@ -23,9 +23,9 @@ table.read_titration_list(filename=args['titration_list'])
 table.print_titration_list()
 table.validate_titration_list_against_molecule(system)
 
-system.set_titratable_group_charges(table, state="neutral")
-system.write_crg("neutral_protein.crg")
-system.write_apbs_pqr("neutral_protein.pqr")
+systemRadii = mymm.Radii(args['radii'])
+systemPatches = mymm.Patch(args['patchfile'])
+system.assign_radii(systemRadii, systemPatches)
 
 
 protein = mymm.Apbs()
@@ -42,12 +42,18 @@ protein_params_hash.update({'sdie':protein.elecParams['pdie']})
 protein.add_elecSection(name="ref", molIndex=1, commands = "write atompot flat ref", additional_params_dict=protein_params_hash)
 protein_params_hash.update({'sdie':protein.elecParams['sdie']})
 
+system.set_titratable_group_charges(table, state="neutral")
+system.write_crg("neutral_protein.crg")
+system.write_apbs_pqr("neutral_protein.pqr")
+neutral_protein_q_vec = system.get_charges()
+
+protein.pqrList.append("neutral_protein.pqr")
+protein.pqrList.append("neutral_protein.pqr")
+protein.print_APBS_input("apbs.in")
+protein.pqrList.pop()
+protein.pqrList.pop()
 
 system.set_titratable_group_charges(table, state="zero")
-systemRadii = mymm.Radii(args['radii'])
-systemPatches = mymm.Patch(args['patchfile'])
-
-system.assign_radii(systemRadii, systemPatches)
 system.write_crg("titratables_zeroed_protein.crg")
 system.write_apbs_pqr("titratables_zeroed_protein.pqr")
 

@@ -24,11 +24,20 @@ table.print_titration_list()
 table.validate_titration_list_against_molecule(system)
 
 system.set_titratable_group_charges(table, state="neutral")
+neutralProteinChargeDistribution = system.get_charges()
 #system.write_crg("neutral_protein.crg")
 #system.write_apbs_pqr("neutral_protein.pqr")
 
 
 protein = mymm.Apbs()
+[neutralProteinSolvationEnergy, neutralProteinPotentialFiles] = protein.parse_APBS_output("apbs.out","apbs.in")
+#print("neutral_protein solvation free energy = " + str(neutralProteinSolvationEnergy) + " kJ/mol")
+#print("neutral protein potential files are ")
+#for newfile in neutralProteinPotentialFiles:
+#        print("\t" + newfile)
+#sys.exit(1)
+
+      
 protein.header_comment = "Junk test APBS input"
 base_dir = os.getcwd()
 protein_params_hash =  {'dime': 33,
@@ -60,12 +69,16 @@ charge_state_hash = {0: "neutral",
 
 proteinChargeDistributions = {}
 solvationEnergy = {}
-
+potentialFiles = {}
 for residue in table.list_of_residues_to_titrate:
     system.zero_all_charges()
 
     proteinChargeDistributions[list_index] = {}
     solvationEnergy[list_index] = {'protein':{},
+                                   'model_compound':{}
+                               }
+
+    potentialFiles[list_index] = {'protein':{},
                                    'model_compound':{}
                                }
 
@@ -92,8 +105,8 @@ for residue in table.list_of_residues_to_titrate:
 
         proteinChargeDistributions[list_index][charge_state] = {'indices': atom_indices,
                                                                 'q': charge_vec}
-        
-        solvationEnergy[list_index]['protein'][charge_state]=protein.parse_APBS_output("apbs.out")
+        [solvationEnergy[list_index]['protein'][charge_state],potentialFiles[list_index]['protein'][charge_state]]=protein.parse_APBS_output("apbs.out","apbs.in")
+
         os.chdir("..")
                      
 #        os.mkdir("model_compound")
@@ -102,7 +115,7 @@ for residue in table.list_of_residues_to_titrate:
         protein.pqrList.append("capped_group.pqr")
         protein.pqrList.append(os.path.join(base_dir, "neutral_protein.pqr"))
 #        protein.print_APBS_input("apbs.in")
-        solvationEnergy[list_index]['model_compound'][charge_state]=protein.parse_APBS_output("apbs.out")
+        [solvationEnergy[list_index]['model_compound'][charge_state],potentialFiles[list_index]['model_compound'][charge_state]]=protein.parse_APBS_output("apbs.out","apbs.in")
         protein.pqrList.pop()
         protein.pqrList.pop()
         os.chdir("..") # out of model_compound
@@ -119,6 +132,6 @@ for siteIndex in proteinChargeDistributions.keys():
         print("\t the " + str(len(indices)) + " indices of the relevant group are " + " ".join(indices) )
         print("\t and the q vector for this charge state is \n" +"\n".join([str(x) for x in proteinChargeDistributions[siteIndex][chargeStateIndex]['q']]))
 
-myhybrid = mymm.Hybrid(table, proteinChargeDistributions, solvationEnergy)
+myhybrid = mymm.Hybrid(table, proteinChargeDistributions, solvationEnergy, potentialFiles, neutralProteinChargeDistribution, neutralProteinSolvationEnergy, neutralProteinPotentialFiles)
 myhybrid.writeHybridInputFile("hybrid.out")
 ##############################################
