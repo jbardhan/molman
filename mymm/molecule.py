@@ -897,15 +897,16 @@ class Molecule:
                                  }
                 atom.set_charge(float(charge_state_dict[state]))
                 indices.append(atom.number)
+
         return indices
 
     def set_titratable_group_charges(self, group_defs, residue=None, state=None):
         indices = []
         if residue is not None:
-            indices.append(self.set_group_charges(group_defs, residue, state))
+            indices.extend(self.set_group_charges(group_defs, residue, state))
         else:
             for residue in group_defs.list_of_residues_to_titrate:
-                indices.append(self.set_group_charges(group_defs, residue, state))
+                indices.extend(self.set_group_charges(group_defs, residue, state))
 
         charge_vec = self.get_charges()
         return [indices, charge_vec]

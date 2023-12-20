@@ -17,7 +17,7 @@ class Titratable:
         
         for line in titration_def_file:
             line_comment = re.search("#", line)
-            if line_comment is not None:
+            if line_comment is not None: 
                 line = line[0:line_comment.start()]
 
             line_init_group = re.search("TITR", line)
@@ -26,10 +26,14 @@ class Titratable:
                 current_res   = line_init_data[1]
                 current_group = line_init_data[2]
                 current_gamma = line_init_data[3]
+                if len(line_init_data) > 4: ## include pKa of model compounds
+                    current_pka_model = line_init_data[4]
+
                 if current_res not in self.table.keys():
                     self.table[current_res] = {}
 
                 self.table[current_res][current_group] = {'gamma':current_gamma,
+                                                          'pKa_model':current_pka_model,
                                                           'atom_charge_states': {}}
                 self.list_of_defined_groups.append(current_group)
                 continue

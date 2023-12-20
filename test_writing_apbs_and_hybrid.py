@@ -24,8 +24,8 @@ table.print_titration_list()
 table.validate_titration_list_against_molecule(system)
 
 system.set_titratable_group_charges(table, state="neutral")
-system.write_crg("neutral_protein.crg")
-system.write_apbs_pqr("neutral_protein.pqr")
+#system.write_crg("neutral_protein.crg")
+#system.write_apbs_pqr("neutral_protein.pqr")
 
 
 protein = mymm.Apbs()
@@ -48,8 +48,8 @@ systemRadii = mymm.Radii(args['radii'])
 systemPatches = mymm.Patch(args['patchfile'])
 
 system.assign_radii(systemRadii, systemPatches)
-system.write_crg("titratables_zeroed_protein.crg")
-system.write_apbs_pqr("titratables_zeroed_protein.pqr")
+#system.write_crg("titratables_zeroed_protein.crg")
+#system.write_apbs_pqr("titratables_zeroed_protein.pqr")
 
 list_index = 0
 top_file = "/home/bard415/repos/60376-testset1/top_PARSE_prot_patch.inp"
@@ -59,42 +59,50 @@ charge_state_hash = {0: "neutral",
 }
 
 proteinChargeDistributions = {}
+solvationEnergy = {}
 
 for residue in table.list_of_residues_to_titrate:
     system.zero_all_charges()
-    proteinChargeDistributions{list_index} = {}
-    
+
+    proteinChargeDistributions[list_index] = {}
+    solvationEnergy[list_index] = {'protein':{},
+                                   'model_compound':{}
+                               }
+
     for charge_state in charge_state_hash.keys():
         site_plus_state = str(list_index) + "_" + str(charge_state)
         print("*****  Doing site plus state " + site_plus_state + "\n")
-        os.mkdir(site_plus_state)
+#        os.mkdir(site_plus_state)
         os.chdir(site_plus_state)
 
-        os.mkdir("protein")
+#        os.mkdir("protein")
         os.chdir("protein")
         [atom_indices, charge_vec] = system.set_titratable_group_charges(table, residue, state=charge_state_hash[charge_state]) 
         system.assign_radii(systemRadii, systemPatches)
+        
  #       print("assigned radii\n")
-        system.write_crg(site_plus_state + ".crg")
-        system.write_apbs_pqr(site_plus_state + ".pqr")
+#        system.write_crg(site_plus_state + ".crg")
+#        system.write_apbs_pqr(site_plus_state + ".pqr")
 
         protein.pqrList.append(site_plus_state+".pqr")
         protein.pqrList.append(os.path.join(base_dir, "neutral_protein.pqr"))
-        protein.print_APBS_input("apbs.in")
+#        protein.print_APBS_input("apbs.in")
         protein.pqrList.pop()
         protein.pqrList.pop()
 
         proteinChargeDistributions[list_index][charge_state] = {'indices': atom_indices,
                                                                 'q': charge_vec}
         
+        solvationEnergy[list_index]['protein'][charge_state]=protein.parse_APBS_output("apbs.out")
         os.chdir("..")
                      
-        os.mkdir("model_compound")
-        os.chdir("model_compound") ### CONFUSING BECAUSE SYSTEM BUILD CHANGES DIRS, REMOVE THAT FUNCTIONALITY OR CREATE EQUIV ABSTRCTION FOR PROTEIN 
-        system.build_titratable_group_model_compound(table, residue, charge_state_hash[charge_state], top_file, radii_file)
+#        os.mkdir("model_compound")
+        os.chdir("model_compound") ### CONFUSING BECAUSE SYSTEM BUILDTGMC CHANGES DIRS, REMOVE THAT FUNCTIONALITY OR CREATE EQUIV ABSTRCTION FOR PROTEIN 
+#        system.build_titratable_group_model_compound(table, residue, charge_state_hash[charge_state], top_file, radii_file)
         protein.pqrList.append("capped_group.pqr")
         protein.pqrList.append(os.path.join(base_dir, "neutral_protein.pqr"))
-        protein.print_APBS_input("apbs.in")
+#        protein.print_APBS_input("apbs.in")
+        solvationEnergy[list_index]['model_compound'][charge_state]=protein.parse_APBS_output("apbs.out")
         protein.pqrList.pop()
         protein.pqrList.pop()
         os.chdir("..") # out of model_compound
@@ -104,6 +112,13 @@ for residue in table.list_of_residues_to_titrate:
 #    sys.exit(1)
     list_index = list_index+1
 
+for siteIndex in proteinChargeDistributions.keys():
+    for chargeStateIndex in proteinChargeDistributions[siteIndex].keys():
+        print("for " + str(siteIndex) + "_" + str(chargeStateIndex) + ":")
+        indices = [str(x) for x in proteinChargeDistributions[siteIndex][chargeStateIndex]['indices']]
+        print("\t the " + str(len(indices)) + " indices of the relevant group are " + " ".join(indices) )
+        print("\t and the q vector for this charge state is \n" +"\n".join([str(x) for x in proteinChargeDistributions[siteIndex][chargeStateIndex]['q']]))
 
-
+myhybrid = mymm.Hybrid(table, proteinChargeDistributions, solvationEnergy)
+myhybrid.writeHybridInputFile("hybrid.out")
 ##############################################

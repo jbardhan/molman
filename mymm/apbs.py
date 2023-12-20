@@ -54,6 +54,32 @@ class Apbs:
                            'commands': ['calcenergy total','calcforce no']
                        }
 
+    def parse_APBS_output_Global_net_ELEC(self, line):
+        words = line.rstrip().lstrip().split()
+        energy = words[5]
+        return energy
+
+    def parse_APBS_output(self, filename):
+        try:
+            with open(filename,'r') as outputFile:
+                lines = outputFile.read().splitlines()
+        except FileNotFoundError:
+            msg = "Could not open file " + filename + " for reading."
+            print(msg)
+            return None
+
+        Global_lines = list(filter(lambda x: re.search("Global net ELEC energy",x), lines))
+        if len(Global_lines) > 1:
+            print("More than one line of "+filename+" matches \"Global net ELEC energy\":")
+            print("They are:\n" + "".join(Global_lines))
+            print("Parsing only the first for returning.")
+
+        if len(Global_lines) == 0:
+            print("No lines match \"Global net ELEC energy.")
+            return None
+
+        energy = self.parse_APBS_output_Global_net_ELEC(Global_lines[0])
+        return energy
 
 #    def get_elecParam(self, paramname, value_if_not_found = None):
 #        if paramname in self.elecParams.keys():
