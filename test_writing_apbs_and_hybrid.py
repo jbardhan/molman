@@ -134,4 +134,5 @@ for siteIndex in proteinChargeDistributions.keys():
 
 myhybrid = mymm.Hybrid(table, proteinChargeDistributions, solvationEnergy, potentialFiles, neutralProteinChargeDistribution, neutralProteinSolvationEnergy, neutralProteinPotentialFiles)
 myhybrid.writeHybridInputFile("hybrid.out")
+myhybrid.testLoadedPotentialsAndCharges()
 ##############################################
