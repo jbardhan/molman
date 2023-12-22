@@ -24,6 +24,9 @@ class Hybrid:
         self.DeltaDeltaGs = []
         self.DeltaGProteins = []
         self.DeltaGModelCompounds = []
+        self.num_titratable_groups = len(self.titrationDetails.list_of_residues_to_titrate)
+        self.Psi = np.zeros((self.num_titratable_groups, self.num_titratable_groups))
+
 
     def loadGroupChargeDistributions(self, chargeDistributions):
         list_index = 0
@@ -177,8 +180,8 @@ class Hybrid:
         self.calculateDeltaDeltaGs()
         self.calculatePsiValues()
         list_index = 0
-        num_titratable_groups = len(self.titrationDetails.list_of_residues_to_titrate)
-        input_file.write(str(num_titratable_groups)+"\n")
+        #num_titratable_groups = len(self.titrationDetails.list_of_residues_to_titrate)
+        input_file.write(str(self.num_titratable_groups)+"\n")
 
         for residue in self.titrationDetails.list_of_residues_to_titrate:
             if residue['group'] not in self.titrationDetails.table.keys():
@@ -196,7 +199,7 @@ class Hybrid:
 
             
             Psi_list = []
-            for j in range(list_index+1,num_titratable_groups):
+            for j in range(list_index+1,self.num_titratable_groups):
                 Psi_i_j = self.Psi[list_index][j] * self.kJ_per_mol_To_kcal_per_mol #"("+str(list_index+1)+", "+str(j)+")"
                 Psi_list.append(Psi_i_j)
                 
@@ -206,8 +209,8 @@ class Hybrid:
         input_file.close()
 
     def calculatePsiValues(self):
-        num_titratable_groups = len(self.titrationDetails.list_of_residues_to_titrate)
-        self.Psi = np.zeros((num_titratable_groups, num_titratable_groups))
+        #num_titratable_groups = len(self.titrationDetails.list_of_residues_to_titrate)
+        #self.Psi = np.zeros((num_titratable_groups, num_titratable_groups))
         list_index = 0
 
         
@@ -218,8 +221,9 @@ class Hybrid:
                 current_residue_info = self.titrationDetails.table[residue['group']][residue['group']]               
 
             gamma_i = float(current_residue_info['gamma'])
+            delta_q =  self.proteinChargeDistributions[list_index][1]['q']-self.proteinChargeDistributions[list_index][0]['q']
                 
-            for j in range(list_index+1, num_titratable_groups):
+            for j in range(list_index+1, self.num_titratable_groups):
                 print("doing (" + str(list_index) + ", " + str(j) + ")")
                 residue_j = self.titrationDetails.list_of_residues_to_titrate[j]
                 if residue_j['group'] not in self.titrationDetails.table.keys():
@@ -228,15 +232,13 @@ class Hybrid:
                     current_residue_j_info = self.titrationDetails.table[residue_j['group']][residue_j['group']]               
 
                 gamma_j = float(current_residue_j_info['gamma'])
-
-                delta_q =  self.proteinChargeDistributions[list_index][1]['q']-self.proteinChargeDistributions[list_index][0]['q']
                 delta_potentials = (self.proteinPotentials['protein'][j][1] - self.proteinPotentials['protein'][j][0])
 
                 self.Psi[list_index][j] =  self.kbT_per_e_To_kJ_per_mol * np.inner(delta_q, delta_potentials) / (gamma_i * gamma_j)
 
-                print("delta_q = " +  str(delta_q))
-                print("delta_potentials = " + str(delta_potentials))
-                print("gamma_i = " + str(gamma_i) + " and gamma_j = " + str(gamma_j))
+                #print("delta_q = " +  str(delta_q))
+                #print("delta_potentials = " + str(delta_potentials))
+                #print("gamma_i = " + str(gamma_i) + " and gamma_j = " + str(gamma_j))
                 #                sys.exit(1)
                 
             list_index = list_index + 1

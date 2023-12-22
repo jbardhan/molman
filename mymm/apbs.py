@@ -7,24 +7,31 @@ class ElecSection:
     def __init__(self, params):
         self.section = copy.deepcopy(params)
 
-    def updateParams(self, new_params):
-        self.section.update(new_params)
+    def updateParams(self, newParams):
+        self.section.update(newParams)
         
-    def set_name(self, name):
+    def setName(self, name):
         self.section['name'] = name
 
-    def set_mol(self, mol):
+    def setMol(self, mol):
         self.section['mol'] = mol
 
-    def add_commands(self, commands):
+    def addCommands(self, commands):
         self.section['commands'].append(commands)
 
-class Apbs:
+class ApbsMetadata:
     def __init__(self):
+        self.workingDirectory = []
+        self.pqrFilename = []
+        self.ApbsInputFilename = []
+
+
+class Apbs:
+    def __init__(self, filename = None):
         self.pqrList = []
         self.elecList = []
         self.analysisList = []
-        self.header_comment = ""
+        self.headerComment = ""
         self.basicSolvation = ""
         self.elecParams = {'dime': 0,
                            'cglen': 0,
@@ -53,13 +60,15 @@ class Apbs:
                            'temp' : 298.15,
                            'commands': ['calcenergy total','calcforce no']
                        }
+        if filename is not None:
+            self.loadFromFile(filename)
 
-    def parse_APBS_output_Global_net_ELEC(self, line):
+    def parseApbsOutputGlobalNetELEC(self, line):
         words = line.rstrip().lstrip().split()
         energy = words[5]
         return float(energy)
 
-    def parse_APBS_output(self, apbsOutFilename, apbsInFilename=None):
+    def parseApbsOutput(self, apbsOutFilename, apbsInFilename=None):
         try:
             with open(apbsOutFilename,'r') as outputFile:
                 lines = outputFile.read().splitlines()
@@ -77,96 +86,81 @@ class Apbs:
                 msg = "Could not open file " + apbsInFilename + "for reading."
                 print(msg)
 
-        Global_lines = list(filter(lambda x: re.search("Global net ELEC energy",x), lines))
-        if len(Global_lines) > 1:
+        GlobalNetLines = list(filter(lambda x: re.search("Global net ELEC energy",x), lines))
+        if len(GlobalNetLines) > 1:
             print("More than one line of "+apbsOutFilename+" matches \"Global net ELEC energy\":")
-            print("They are:\n" + "".join(Global_lines))
+            print("They are:\n" + "".join(GlobalNetLines))
             print("Parsing only the first for returning.")
 
-        if len(Global_lines) == 0:
+        if len(GlobalNetLines) == 0:
             print("No lines match \"Global net ELEC energy.")
             return None
-        energy = self.parse_APBS_output_Global_net_ELEC(Global_lines[0])
+        energy = self.parseApbsOutputGlobalNetELEC(GlobalNetLines[0])
 
         atompotFiles = []
         if inputLines is not None:
-            atompot_flat_lines = list(filter(lambda x: re.search("write atompot flat",x), inputLines))
-            for line in atompot_flat_lines:
+            atompotFlatLines = list(filter(lambda x: re.search("write atompot flat",x), inputLines))
+            for line in atompotFlatLines:
                 words = line.rstrip().lstrip().split()
                 atompotFiles.append(os.path.join(os.getcwd(),words[3]+".txt"))
 
         return [energy, atompotFiles]
 
-#    def get_elecParam(self, paramname, value_if_not_found = None):
-#        if paramname in self.elecParams.keys():
-#            return self.elecParams[paramname]#
-#
-#        return value_if_not_found
+    def addElecSection(self, name, molIndex, commands, additionalParamsDict):
+        newElecSection = ElecSection(self.elecParams)
+        newElecSection.updateParams(additionalParamsDict)
+        newElecSection.setName(name)
+        newElecSection.setMol(molIndex)
+        newElecSection.addCommands(commands)
+        self.elecList.append(newElecSection)
 
-#    def set_elecParam(self, paramname, value, warning_if_already_set = None):
-#        if paramname in self.elecParams.keys():
-#            if self.elecParams[paramname] is not None:
-#                if warning_if_already_set is not None:
-#                    printf("Warning: elecParams['"+paramname+"'] is already set to "+str(self.elecParams[paramname])+"\n")
-#
-#        self.elecParams[paramname] = value
-
-    def add_elecSection(self, name, molIndex, commands, additional_params_dict):
-        new_elecSection = ElecSection(self.elecParams)
-        new_elecSection.updateParams(additional_params_dict)
-        new_elecSection.set_name(name)
-        new_elecSection.set_mol(molIndex)
-        new_elecSection.add_commands(commands)
-        self.elecList.append(new_elecSection)
-
-    def add_analysisSection(self, commands):
+    def addAnalysisSection(self, commands):
         if type(commands) is list:
             for command in commands:
                 self.analysisList.append(command) 
         else:
             self.analysisList.append(commands)
     
-        
-    def print_APBS_input(self, filename):
-        input_file = open(filename, 'w')
+    def printApbsInput(self, filename):
+        inputFile = open(filename, 'w')
 
-        self.print_APBS_header(input_file)
+        self.printAPBSHeader(inputFile)
 
-        self.print_APBS_read_section(input_file)
+        self.printAPBSReadSection(inputFile)
         
         for elecSection in self.elecList:
-            self.print_APBS_elecSection(input_file, elecSection.section)
+            self.printAPBSElecSection(inputFile, elecSection.section)
 
         for analysisSection in self.analysisList:
-            self.print_APBS_analysisSection(input_file, analysisSection)
+            self.printAPBSAnalysisSection(inputFile, analysisSection)
 
-        self.print_APBS_closeout(input_file)
+        self.printAPBSCloseout(inputFile)
 
-        input_file.close()
+        inputFile.close()
 
-    def print_APBS_header(self, filehandle):
-        self.print_comment_line_separator(filehandle)
-        filehandle.write("# " + self.header_comment + "\n")
-        self.print_comment_line_separator(filehandle)
+    def printAPBSHeader(self, filehandle):
+        self.printAPBSCommentLineSeparator(filehandle)
+        filehandle.write("# " + self.headerComment + "\n")
+        self.printAPBSCommentLineSeparator(filehandle)
 
-    def print_comment_line_separator(self, filehandle):
+    def printAPBSCommentLineSeparator(self, filehandle):
         filehandle.write("#####"*8 + "\n")
 
-    def print_APBS_read_section(self, filehandle):
+    def printAPBSReadSection(self, filehandle):
         filehandle.write("read\n")
         for pqr in self.pqrList:
             filehandle.write("\tmol pqr " + pqr + "\n")
         filehandle.write("end\n\n")
 
-    def print_APBS_closeout(self, filehandle):
+    def printAPBSCloseout(self, filehandle):
         filehandle.write("quit\n")
 
-    def print_APBS_analysisSection(self, filehandle, section):
-        self.print_comment_line_separator(filehandle)
+    def printAPBSAnalysisSection(self, filehandle, section):
+        self.printAPBSCommentLineSeparator(filehandle)
         filehandle.write(section + "\n")
         filehandle.write("\n")
 
-    def print_APBS_elecSection(self, filehandle, section):
+    def printAPBSElecSection(self, filehandle, section):
         filehandle.write("elec name " + section['name'] + "\n")
         filehandle.write("\t" + section['calc-type'] + "\n")
 
