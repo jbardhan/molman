@@ -27,7 +27,7 @@ system.write_crg("titratables_zeroed_protein.crg")
 system.write_apbs_pqr("titratables_zeroed_protein.pqr")
 
 list_index = 0
-for residue in table.list_of_residues_to_titrate:
+for residue in table.listOfResiduesToTitrate:
     system.zero_all_charges()
     system.set_titratable_group_charges(table, residue, state="neutral") # neutral
     system.write_crg(str(list_index)+"_0.crg")

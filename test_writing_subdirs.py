@@ -36,7 +36,7 @@ charge_state_hash = {0: "neutral",
                      1: "charged"
 }                     
 
-for residue in table.list_of_residues_to_titrate:
+for residue in table.listOfResiduesToTitrate:
     system.zero_all_charges()
     
     for charge_state in charge_state_hash.keys():

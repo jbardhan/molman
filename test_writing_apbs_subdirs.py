@@ -15,17 +15,15 @@ args = { 'pdb': 'arg_capped_nter_cter_PARSE.pdb',
 system = mymm.Molecule(PDB=args['pdb'])
 system.read_psf(filename = args['psf'])
 system.assign_charges()
-
-table = mymm.Titratable(filename = args['def_file'])
-table.print_titratable_definitions()
-
-table.read_titration_list(filename=args['titration_list'])
-table.print_titration_list()
-table.validate_titration_list_against_molecule(system)
-
 systemRadii = mymm.Radii(args['radii'])
 systemPatches = mymm.Patch(args['patchfile'])
 system.assign_radii(systemRadii, systemPatches)
+
+table = mymm.Titratable(filename = args['def_file'])
+table.print_titratable_definitions()
+table.read_titration_list(filename=args['titration_list'])
+table.print_titration_list()
+table.validate_titration_list_against_molecule(system)
 
 
 protein = mymm.Apbs()
@@ -64,7 +62,7 @@ charge_state_hash = {0: "neutral",
                      1: "charged"
 }
 
-for residue in table.list_of_residues_to_titrate:
+for residue in table.listOfResiduesToTitrate:
     system.zero_all_charges()
     
     for charge_state in charge_state_hash.keys():

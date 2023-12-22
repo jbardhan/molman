@@ -2,52 +2,76 @@ import re, os, sys, subprocess, argparse, logging
 import mymm
 
 class Titratable:
+    '''
+    Titratable objects hold the defined titratable groups (in Titratable.table), a list 
+    of what groups are defined (in Titratable.listOfDefinedGroups), and a list of the 
+    titratable groups in a given molecule (in Titratable.listOfResiduesToTitrate)
+
+    Usage:
+    a = Titratable("titratable_PARSE.def")
+
+    After this call,
+    a.Titratable['GLU']['GLU'] is a hash with 
+    {'gamma': -1,
+     'pKa_model':4.07,
+     'atom_charge_states': {
+        'CD': [0.55, 0.10]
+        'OE1': [-0.49, -0.55]
+        'OE2': [-0.06, -0.55]
+        }
+    }
+    '''
     def __init__(self, filename = None):
+        '''
+        a = Titratable(filename = None)
+        '''
         self.table = {}
-        self.list_of_defined_groups = []
-        self.list_of_residues_to_titrate = []
+        self.listOfDefinedGroups = []
+        self.listOfResiduesToTitrate = []
         if filename is not None:
-            self.read_titratable_definitions(filename)
+            self.readTitratableGroupDefinitions(filename)
 
-    def read_titratable_definitions(self, filename):
-        titration_def_file = open(filename)
-
-        current_group = ""
-        current_res   = ""  ## CAN BE GLOBAL
+    def readTitratableGroupDefinitions(self, filename):
+        '''
+        readTitratableGroupDefinitions(filename)
+        '''
+        TitrationDefFilehandle = open(filename)
+        currentGroup = ""
+        currentRes   = ""  ## CAN BE GLOBAL
         
-        for line in titration_def_file:
-            line_comment = re.search("#", line)
-            if line_comment is not None: 
-                line = line[0:line_comment.start()]
+        for line in TitrationDefFilehandle:
+            lineCommentSearchResult = re.search("#", line)
+            if lineCommentSearchResult is not None: 
+                line = line[0:lineCommentSearchResult.start()]
 
-            line_init_group = re.search("TITR", line)
-            if line_init_group is not None:
-                line_init_data = line.rstrip().lstrip().split()
-                current_res   = line_init_data[1]
-                current_group = line_init_data[2]
-                current_gamma = line_init_data[3]
-                if len(line_init_data) > 4: ## include pKa of model compounds
-                    current_pka_model = line_init_data[4]
+            lineInitializeGroupSearchResult = re.search("TITR", line)
+            if lineInitializeGroupSearchResult is not None:
+                lineInitializeGroupWords = line.rstrip().lstrip().split()
+                currentRes   = lineInitializeGroupWords[1]
+                currentGroup = lineInitializeGroupWords[2]
+                currentGamma = lineInitializeGroupWords[3]
+                if len(lineInitializeGroupWords) > 4: ## include pKa of model compounds
+                    currentPkaModelCompound = lineInitializeGroupWords[4]
 
-                if current_res not in self.table.keys():
-                    self.table[current_res] = {}
+                if currentRes not in self.table.keys():
+                    self.table[currentRes] = {}
 
-                self.table[current_res][current_group] = {'gamma':current_gamma,
-                                                          'pKa_model':current_pka_model,
+                self.table[currentRes][currentGroup] = {'gamma':currentGamma,
+                                                          'pKa_model':currentPkaModelCompound,
                                                           'atom_charge_states': {}}
-                self.list_of_defined_groups.append(current_group)
+                self.listOfDefinedGroups.append(currentGroup)
                 continue
 
-            line_data = line.rstrip().lstrip().split()
-            if len(line_data) == 0:
+            lineInsideGroupDefinitionWords = line.rstrip().lstrip().split()
+            if len(lineInsideGroupDefinitionWords) == 0:
                 continue
 
-            if len(line_data) > 3:
-                print("Error, line_data should only have 3 entries!\n")
+            if len(lineInsideGroupDefinitionWords) > 3:
+                print("Error, lineInsideGroupDefinitionWords should only have 3 entries!\n")
 
-            self.table[current_res][current_group]['atom_charge_states'][line_data[0]] = [line_data[1],line_data[2]]
+            self.table[currentRes][currentGroup]['atom_charge_states'][lineInsideGroupDefinitionWords[0]] = [lineInsideGroupDefinitionWords[1],lineInsideGroupDefinitionWords[2]]
 
-        titration_def_file.close()
+        TitrationDefFilehandle.close()
 
     def print_titratable_definitions(self):
         residue_list = self.table.keys()
@@ -98,28 +122,29 @@ class Titratable:
                 print("Error in parsing list of residues to titrate!  Line\n"+line+"\n\t should have only 3 elements, a segid, a resnum, and a titratable groupname")
                 sys.exit(1)
 
-            self.list_of_residues_to_titrate.append({'segid':line_data[0],
-                                                     'resnum':line_data[1],
-                                                     'group':line_data[2]})
+            self.listOfResiduesToTitrate.append({'segid':line_data[0],
+                                                'resnum':line_data[1],
+                                                'group':line_data[2]
+                                                })
 
             ## exit if this group is not recognized
-            if line_data[2] not in self.list_of_defined_groups:
+            if line_data[2] not in self.listOfDefinedGroups:
                 print("Error in parsing list of residues to titrate!  Group " + line_data[2] + " is not in the list of defined groups: \n")
-                print("\t"+' ,'.join(self.list_of_defined_groups) + "\n")
+                print("\t"+' ,'.join(self.listOfDefinedGroups) + "\n")
                 sys.exit(1)
 
         titration_list_file.close()
 
     def print_titration_list(self):
         print("List of residues to titrate:\n")
-        for residue in self.list_of_residues_to_titrate:
+        for residue in self.listOfResiduesToTitrate:
             print("Titratable group " + residue['group'] + " at " + residue['segid'] + ":" + residue['resnum']+"\n")
 
         print("\n")
 
     def validate_titration_list_against_molecule(self, molecule):
 
-        for residue in self.list_of_residues_to_titrate:
+        for residue in self.listOfResiduesToTitrate:
             thisresnums = []
             thisresnums.append(int(residue['resnum']))
             print("For titratable residue specified as " + residue['segid']+":"+residue['resnum']+":"+residue['group']+"\n")

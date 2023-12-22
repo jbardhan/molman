@@ -70,7 +70,7 @@ charge_state_hash = {0: "neutral",
 proteinChargeDistributions = {}
 solvationEnergy = {}
 potentialFiles = {}
-for residue in table.list_of_residues_to_titrate:
+for residue in table.listOfResiduesToTitrate:
     system.zero_all_charges()
 
     proteinChargeDistributions[list_index] = {}
