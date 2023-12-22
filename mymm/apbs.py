@@ -54,6 +54,48 @@ class Apbs:
                            'commands': ['calcenergy total','calcforce no']
                        }
 
+    def parse_APBS_output_Global_net_ELEC(self, line):
+        words = line.rstrip().lstrip().split()
+        energy = words[5]
+        return float(energy)
+
+    def parse_APBS_output(self, apbsOutFilename, apbsInFilename=None):
+        try:
+            with open(apbsOutFilename,'r') as outputFile:
+                lines = outputFile.read().splitlines()
+        except FileNotFoundError:
+            msg = "Could not open file " + apbsOutFilename + " for reading."
+            print(msg)
+            return None
+
+        inputLines = None
+        if apbsInFilename is not None:
+            try:
+                with open(apbsInFilename,'r') as inputFile:
+                    inputLines = inputFile.read().splitlines()
+            except FileNotFoundError:
+                msg = "Could not open file " + apbsInFilename + "for reading."
+                print(msg)
+
+        Global_lines = list(filter(lambda x: re.search("Global net ELEC energy",x), lines))
+        if len(Global_lines) > 1:
+            print("More than one line of "+apbsOutFilename+" matches \"Global net ELEC energy\":")
+            print("They are:\n" + "".join(Global_lines))
+            print("Parsing only the first for returning.")
+
+        if len(Global_lines) == 0:
+            print("No lines match \"Global net ELEC energy.")
+            return None
+        energy = self.parse_APBS_output_Global_net_ELEC(Global_lines[0])
+
+        atompotFiles = []
+        if inputLines is not None:
+            atompot_flat_lines = list(filter(lambda x: re.search("write atompot flat",x), inputLines))
+            for line in atompot_flat_lines:
+                words = line.rstrip().lstrip().split()
+                atompotFiles.append(os.path.join(os.getcwd(),words[3]+".txt"))
+
+        return [energy, atompotFiles]
 
 #    def get_elecParam(self, paramname, value_if_not_found = None):
 #        if paramname in self.elecParams.keys():

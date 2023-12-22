@@ -12,8 +12,9 @@ class Patch:
         for line in fh:
             line_data = line.rstrip().lstrip().split()
             print("length of line data is " + str(len(line_data)))
-            (segid, resnum, patch) = (line_data[0],line_data[1],line_data[2])
-            self.add_patched_site(segid, resnum, patch)
+            if len(line_data)==3:
+                (segid, resnum, patch) = (line_data[0],line_data[1],line_data[2])
+                self.add_patched_site(segid, resnum, patch)
         fh.close()
 
     def add_patched_site(self,segid, resnum, patch):

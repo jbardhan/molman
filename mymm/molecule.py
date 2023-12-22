@@ -24,6 +24,7 @@ class Molecule:
             self.read_amber_crd(AMBER_CRD)
 
     def get_charges(self):
+        print("WARNING: reminder - Molecule.get_charges() may not return the charges in the expected order. Fix this!")
         q_vec = []
         for atom in self.atoms:
             q_vec.append(atom.q)
@@ -876,6 +877,7 @@ class Molecule:
             atom.set_charge(0.0)
 
     def set_group_charges(self, group_defs, residue, state):
+        indices = []
         if residue['group'] not in group_defs.table.keys():
             titratable_group_def = group_defs.table['GLOBAL'][residue['group']]['atom_charge_states']
         else:
@@ -894,16 +896,21 @@ class Molecule:
                                      'charged':titratable_group_def[atom.atomid][1]
                                  }
                 atom.set_charge(float(charge_state_dict[state]))
+                indices.append(atom.number)
 
+        return indices
 
     def set_titratable_group_charges(self, group_defs, residue=None, state=None):
+        indices = []
         if residue is not None:
-            self.set_group_charges(group_defs, residue, state)
+            indices.extend(self.set_group_charges(group_defs, residue, state))
         else:
             for residue in group_defs.list_of_residues_to_titrate:
-                self.set_group_charges(group_defs, residue, state)
+                indices.extend(self.set_group_charges(group_defs, residue, state))
 
-
+        charge_vec = self.get_charges()
+        return [indices, charge_vec]
+        
     def build_titratable_group_model_compound(self, group_defs, residue, state, topologyFileList, radii_list):
 
         if type(radii_list) is not list:

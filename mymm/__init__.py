@@ -18,3 +18,4 @@ from .runfile import *
 from .altmansrf import *
 from .titratable import *
 from .apbs import *
+from .hybrid import *
