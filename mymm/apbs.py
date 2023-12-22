@@ -29,6 +29,22 @@ class ApbsMetadata:
         self.rawAtomPotFilename = rawFilename
         self.solvAtomPotFilename = solvFilename
 
+class ApbsOutputData:
+    def __init__(self, apbsMetadata = None):
+        self.workingDirectory = None
+        self.pqrFilename = None
+        self.pqr = None
+        self.temperature = None
+        self.rawPotentials = None
+        self.solvPotentials = None
+        self.reacPotentials = None
+
+        if apbsMetadata is not None:
+            self.loadFromApbsMetadata(apbsMetadata)
+
+    def loadFromApbsMetadata(apbsMetadata):
+        self.pqr = 0
+
 class Apbs:
     def __init__(self, filename = None, pdie=1.0, sdie=78.65, temp=298.15):
         self.pqrList = []

@@ -162,7 +162,10 @@ class Titratable:
         print("\n")
 
     def validateTitrationListAgainstMolecule(self, molecule):
-
+        '''
+        validateTitrationListAgainstMolecule(protein) makes sure that the Titratable object's listOfResiduesToTitrate 
+        only lists residues that actually exist in the Molecule object protein.
+        '''
         for residue in self.listOfResiduesToTitrate:
             thisresnums = []
             thisresnums.append(int(residue['resnum']))
