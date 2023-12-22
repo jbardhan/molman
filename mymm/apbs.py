@@ -20,14 +20,17 @@ class ElecSection:
         self.section['commands'].append(commands)
 
 class ApbsMetadata:
-    def __init__(self):
-        self.workingDirectory = []
-        self.pqrFilename = []
-        self.ApbsInputFilename = []
-
+    def __init__(self, wd=None, pqr=None, apbsIn=None, apbsOut="apbs.out", temp=None, rawFilename=None, solvFilename=None):
+        self.workingDirectory = wd
+        self.pqrFilename = pqr
+        self.apbsInputFilename = apbsIn
+        self.apbsOutputFilename = apbsOut
+        self.temperature = temp
+        self.rawAtomPotFilename = rawFilename
+        self.solvAtomPotFilename = solvFilename
 
 class Apbs:
-    def __init__(self, filename = None):
+    def __init__(self, filename = None, pdie=1.0, sdie=78.65, temp=298.15):
         self.pqrList = []
         self.elecList = []
         self.analysisList = []
@@ -50,14 +53,14 @@ class Apbs:
                                     'conc': 0.000,
                                     'radius': 2.0
                                  }],
-                           'pdie':1.0,
-                           'sdie':78.54,
+                           'pdie':pdie,
+                           'sdie':sdie,
                            'chgm':'spl0',
                            'srfm':'mol',
                            'srad': 0.0,
                            'swin' : 0.3,
                            'sdens' : 10.0,
-                           'temp' : 298.15,
+                           'temp' : temp,
                            'commands': ['calcenergy total','calcforce no']
                        }
         if filename is not None:
@@ -124,43 +127,43 @@ class Apbs:
     def printApbsInput(self, filename):
         inputFile = open(filename, 'w')
 
-        self.printAPBSHeader(inputFile)
+        self.printApbsHeader(inputFile)
 
-        self.printAPBSReadSection(inputFile)
+        self.printApbsReadSection(inputFile)
         
         for elecSection in self.elecList:
-            self.printAPBSElecSection(inputFile, elecSection.section)
+            self.printApbsElecSection(inputFile, elecSection.section)
 
         for analysisSection in self.analysisList:
-            self.printAPBSAnalysisSection(inputFile, analysisSection)
+            self.printApbsAnalysisSection(inputFile, analysisSection)
 
-        self.printAPBSCloseout(inputFile)
+        self.printApbsCloseout(inputFile)
 
         inputFile.close()
 
-    def printAPBSHeader(self, filehandle):
-        self.printAPBSCommentLineSeparator(filehandle)
+    def printApbsHeader(self, filehandle):
+        self.printApbsCommentLineSeparator(filehandle)
         filehandle.write("# " + self.headerComment + "\n")
-        self.printAPBSCommentLineSeparator(filehandle)
+        self.printApbsCommentLineSeparator(filehandle)
 
-    def printAPBSCommentLineSeparator(self, filehandle):
+    def printApbsCommentLineSeparator(self, filehandle):
         filehandle.write("#####"*8 + "\n")
 
-    def printAPBSReadSection(self, filehandle):
+    def printApbsReadSection(self, filehandle):
         filehandle.write("read\n")
         for pqr in self.pqrList:
             filehandle.write("\tmol pqr " + pqr + "\n")
         filehandle.write("end\n\n")
 
-    def printAPBSCloseout(self, filehandle):
+    def printApbsCloseout(self, filehandle):
         filehandle.write("quit\n")
 
-    def printAPBSAnalysisSection(self, filehandle, section):
-        self.printAPBSCommentLineSeparator(filehandle)
+    def printApbsAnalysisSection(self, filehandle, section):
+        self.printApbsCommentLineSeparator(filehandle)
         filehandle.write(section + "\n")
         filehandle.write("\n")
 
-    def printAPBSElecSection(self, filehandle, section):
+    def printApbsElecSection(self, filehandle, section):
         filehandle.write("elec name " + section['name'] + "\n")
         filehandle.write("\t" + section['calc-type'] + "\n")
 
