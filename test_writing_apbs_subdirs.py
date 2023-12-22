@@ -29,17 +29,17 @@ system.assign_radii(systemRadii, systemPatches)
 
 
 protein = mymm.Apbs()
-protein.header_comment = "Junk test APBS input"
+protein.headerComment = "Junk test APBS input"
 base_dir = os.getcwd()
 protein_params_hash =  {'dime': 33,
                         'cglen': [40, 40, 40],
                         'fglen': [20, 20, 20],
                         'fgcent': 2,
                         'cgcent':2}
-protein.add_analysisSection(["print elecEnergy solv - ref end"])
-protein.add_elecSection(name="solv", molIndex=1, commands = "write atompot flat solv", additional_params_dict=protein_params_hash)
+protein.addAnalysisSection(["print elecEnergy solv - ref end"])
+protein.addElecSection(name="solv", molIndex=1, commands = "write atompot flat solv", additional_params_dict=protein_params_hash)
 protein_params_hash.update({'sdie':protein.elecParams['pdie']})
-protein.add_elecSection(name="ref", molIndex=1, commands = "write atompot flat ref", additional_params_dict=protein_params_hash)
+protein.addElecSection(name="ref", molIndex=1, commands = "write atompot flat ref", additional_params_dict=protein_params_hash)
 protein_params_hash.update({'sdie':protein.elecParams['sdie']})
 
 system.set_titratable_group_charges(table, state="neutral")
@@ -49,7 +49,7 @@ neutral_protein_q_vec = system.get_charges()
 
 protein.pqrList.append("neutral_protein.pqr")
 protein.pqrList.append("neutral_protein.pqr")
-protein.print_APBS_input("apbs.in")
+protein.printApbsInput("apbs.in")
 protein.pqrList.pop()
 protein.pqrList.pop()
 
@@ -83,7 +83,7 @@ for residue in table.list_of_residues_to_titrate:
 
         protein.pqrList.append(site_plus_state+".pqr")
         protein.pqrList.append(os.path.join(base_dir, "neutral_protein.pqr"))
-        protein.print_APBS_input("apbs.in")
+        protein.printApbsInput("apbs.in")
         protein.pqrList.pop()
         protein.pqrList.pop()
 #        sys.exit(1)
@@ -95,7 +95,7 @@ for residue in table.list_of_residues_to_titrate:
         system.build_titratable_group_model_compound(table, residue, charge_state_hash[charge_state], top_file, radii_file)
         protein.pqrList.append("capped_group.pqr")
         protein.pqrList.append(os.path.join(base_dir, "neutral_protein.pqr"))
-        protein.print_APBS_input("apbs.in")
+        protein.printApbsInput("apbs.in")
         protein.pqrList.pop()
         protein.pqrList.pop()
         os.chdir("..") # out of model_compound
