@@ -3,15 +3,16 @@ import mymm
 
 class Titratable:
     '''
-    Titratable objects hold the defined titratable groups (in Titratable.table), a list 
-    of what groups are defined (in Titratable.listOfDefinedGroups), and a list of the 
-    titratable groups in a given molecule (in Titratable.listOfResiduesToTitrate)
+    Titratable objects hold:
+    - the defined titratable groups (in Titratable.table)
+    - a list of what groups are defined (in Titratable.listOfDefinedGroups)
+    - a list of the titratable groups in a given molecule (in Titratable.listOfResiduesToTitrate)
 
     Usage:
     a = Titratable("titratable_PARSE.def")
 
     After this call,
-    a.Titratable['GLU']['GLU'] is a hash with 
+    a.table['GLU']['GLU'] is a hash with 
     {'gamma': -1,
      'pKa_model':4.07,
      'atom_charge_states': {
@@ -20,6 +21,20 @@ class Titratable:
         'OE2': [-0.06, -0.55]
         }
     }
+
+    The 'NTER' and 'CTER' groups can be applied to any residue and are stored within
+    a.table['GLOBAL']['NTER']
+    a.table['GLOBAL']['CTER']
+    respectively.  (This choice made other things harder.  Better approaches are welcome and 
+    worth implementing.)
+
+    At the present time, 
+    a.listOfDefinedGroups is just the RESNAMES (ASP, GLU, etc) as well as NTER and CTER.
+    This is a helper because you can check if a given residue number + group involves the
+    actual residue (e.g. ASP) or if it involves one of the groups listed under 'GLOBAL'.
+
+    After you call 
+    a.
     '''
     def __init__(self, filename = None):
         '''
@@ -73,7 +88,7 @@ class Titratable:
 
         TitrationDefFilehandle.close()
 
-    def print_titratable_definitions(self):
+    def printTitratableDefinitions(self):
         residue_list = self.table.keys()
         print("Residues that have titratable groups:\n")
         print("\t" + ', '.join(residue_list))
@@ -103,7 +118,7 @@ class Titratable:
 
                 print("\n")
             
-    def read_titration_list(self, filename):
+    def readTitrationList(self, filename):
         titration_list_file = open(filename)
 
         for line in titration_list_file:
@@ -135,14 +150,18 @@ class Titratable:
 
         titration_list_file.close()
 
-    def print_titration_list(self):
+    def printTitrationList(self):
+        '''
+        printTitrationList() simply prints the list of groups to titrate, in the form
+
+        Titratable group CTER at A:2
+        '''
         print("List of residues to titrate:\n")
         for residue in self.listOfResiduesToTitrate:
             print("Titratable group " + residue['group'] + " at " + residue['segid'] + ":" + residue['resnum']+"\n")
-
         print("\n")
 
-    def validate_titration_list_against_molecule(self, molecule):
+    def validateTitrationListAgainstMolecule(self, molecule):
 
         for residue in self.listOfResiduesToTitrate:
             thisresnums = []

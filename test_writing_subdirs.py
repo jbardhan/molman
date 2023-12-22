@@ -15,11 +15,11 @@ system.read_psf(filename = args['psf'])
 system.assign_charges()
 
 table = mymm.Titratable(filename = args['def_file'])
-table.print_titratable_definitions()
+table.printTitratableDefinitions()
 
-table.read_titration_list(filename=args['titration_list'])
-table.print_titration_list()
-table.validate_titration_list_against_molecule(system)
+table.readTitrationList(filename=args['titration_list'])
+table.printTitrationList()
+table.validateTitrationListAgainstMolecule(system)
 
 system.set_titratable_group_charges(table, state="neutral")
 system.write_crg("neutral_protein.crg")

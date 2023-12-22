@@ -20,7 +20,7 @@ systemPatches = mymm.Patch(args['patchfile'])
 system.assign_radii(systemRadii, systemPatches)
 
 table = mymm.Titratable(filename = args['def_file'])
-table.print_titratable_definitions()
+table.printTitratableDefinitions()
 table.read_titration_list(filename=args['titration_list'])
 table.print_titration_list()
 table.validate_titration_list_against_molecule(system)
