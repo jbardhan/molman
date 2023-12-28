@@ -46,7 +46,7 @@ class ApbsOutputData:
         self.pqr = 0
 
 class Apbs:
-    def __init__(self, filename = None, pdie=10.0, sdie=78.54, temp=298.15):
+    def __init__(self, filename = None, pdie=20.0, sdie=78.54, temp=298.15):
         self.pqrList = []
         self.elecList = []
         self.analysisList = []
