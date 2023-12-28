@@ -21,9 +21,9 @@ system.assign_radii(systemRadii, systemPatches)
 
 table = mymm.Titratable(filename = args['def_file'])
 table.printTitratableDefinitions()
-table.read_titration_list(filename=args['titration_list'])
-table.print_titration_list()
-table.validate_titration_list_against_molecule(system)
+table.readTitrationList(filename=args['titration_list'])
+table.printTitrationList()
+table.validateTitrationListAgainstMolecule(system)
 
 
 protein = mymm.Apbs()
@@ -35,9 +35,9 @@ protein_params_hash =  {'dime': 33,
                         'fgcent': 2,
                         'cgcent':2}
 protein.addAnalysisSection(["print elecEnergy solv - ref end"])
-protein.addElecSection(name="solv", molIndex=1, commands = "write atompot flat solv", additional_params_dict=protein_params_hash)
+protein.addElecSection(name="solv", molIndex=1, commands = "write atompot flat solv", additionalParamsDict=protein_params_hash)
 protein_params_hash.update({'sdie':protein.elecParams['pdie']})
-protein.addElecSection(name="ref", molIndex=1, commands = "write atompot flat ref", additional_params_dict=protein_params_hash)
+protein.addElecSection(name="ref", molIndex=1, commands = "write atompot flat ref", additionalParamsDict=protein_params_hash)
 protein_params_hash.update({'sdie':protein.elecParams['sdie']})
 
 system.set_titratable_group_charges(table, state="neutral")

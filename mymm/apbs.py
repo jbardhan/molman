@@ -42,11 +42,11 @@ class ApbsOutputData:
         if apbsMetadata is not None:
             self.loadFromApbsMetadata(apbsMetadata)
 
-    def loadFromApbsMetadata(apbsMetadata):
+    def loadFromApbsMetadata(self, apbsMetadata):
         self.pqr = 0
 
 class Apbs:
-    def __init__(self, filename = None, pdie=1.0, sdie=78.65, temp=298.15):
+    def __init__(self, filename = None, pdie=1.0, sdie=78.54, temp=298.15):
         self.pqrList = []
         self.elecList = []
         self.analysisList = []

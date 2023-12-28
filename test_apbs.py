@@ -21,13 +21,13 @@ protein_params_hash =  {'dime': 33,
                         'cglen': [40, 40, 40],
                         'fglen': [20, 20, 20],
                         'fgcent': 1,
-                        'cgcent':1}
+                        'cgcent': 1}
 
-protein.addElecSection(name="solv", molIndex=1, commands = "write atompot flat solv-", additional_params_dict=protein_params_hash)
+protein.addElecSection(name="solv", molIndex=1, commands = "write atompot flat solv", additionalParamsDict=protein_params_hash)
 
 protein_params_hash.update({'sdie':protein.elecParams['pdie']})
 
-protein.addElecSection(name="ref", molIndex=1, commands = "write atompot flat ref", additional_params_dict=protein_params_hash)
+protein.addElecSection(name="ref", molIndex=1, commands = "write atompot flat ref", additionalParamsDict=protein_params_hash)
 
 protein.addAnalysisSection(["print elecEnergy solv - ref end"])
 protein.printApbsInput("foo.in")

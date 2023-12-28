@@ -905,7 +905,7 @@ class Molecule:
         if residue is not None:
             indices.extend(self.set_group_charges(group_defs, residue, state))
         else:
-            for residue in group_defs.list_of_residues_to_titrate:
+            for residue in group_defs.listOfResiduesToTitrate:
                 indices.extend(self.set_group_charges(group_defs, residue, state))
 
         charge_vec = self.get_charges()
