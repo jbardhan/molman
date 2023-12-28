@@ -10,26 +10,26 @@ def runApbs():
         subprocess.run(ApbsListForRun, stdout=outfile)
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--pdb", nargs=1, help="input PDB file")
+parser.add_argument("--psf", nargs=1, help="input PSF file")
+parser.add_argument("--titratables_def", nargs=1, help="file defining the titratable groups, their charges, and model pKa")
+parser.add_argument("--titration_list",nargs=1, help="file listing the groups to titrate")
+parser.add_argument("--topology", nargs=1, help="CHARMM style topology file--use a PARSE_prot_patch file")
+parser.add_argument("--radii", nargs=1, help="radii.siz file")
+parser.add_argument("--patchfile", nargs=1, help="file listing key patches")
+args = parser.parse_args()
 
-args = { 'pdb': 'arg_capped_nter_cter_PARSE.pdb',
-         'psf': 'arg_capped_nter_cter_PARSE.psf',
-         'def_file': '../titratable_PARSE.def',
-         'titration_list' : 'titration_list.txt',
-         'topology' : '/home/bard415/repos/60376-testset1/top_PARSE_prot_patch.inp',
-         'radii' : '/home/bard415/repos/parameters/radii_fixNH3.siz',
-         'patchfile' : '/home/bard415/repos/60376-testset1/testing-writing-subdirs/patchfile'
-}
-
-system = mymm.Molecule(PDB=args['pdb'])
-system.read_psf(filename = args['psf'])
+system = mymm.Molecule(PDB=args.pdb[0])
+system.read_psf(filename = args.psf[0])
 system.assign_charges()
-systemRadii = mymm.Radii(args['radii'])
-systemPatches = mymm.Patch(args['patchfile'])
+systemRadii = mymm.Radii(args.radii[0])
+systemPatches = mymm.Patch(args.patchfile[0])
 system.assign_radii(systemRadii, systemPatches)
 
-table = mymm.Titratable(filename = args['def_file'])
+table = mymm.Titratable(filename = args.titratables_def[0])
 table.printTitratableDefinitions()
-table.readTitrationList(filename=args['titration_list'])
+table.readTitrationList(filename=args.titration_list[0])
 table.printTitrationList()
 table.validateTitrationListAgainstMolecule(system)
 
