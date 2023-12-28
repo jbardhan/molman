@@ -31,7 +31,7 @@ class Hybrid:
                  neutralChargeDistribution, neutralSolvationEnergy, neutralPotentialFiles, temperature = 298.15):
         self.kbT_per_e_To_kJ_per_mol = (0.02585202*temperature/300.) * 96.485332  # first quantity from APBS docs (write.html) and second from NIST tables
         self.kJ_per_mol_To_kcal_per_mol = 1.0 / 4.184 
-        self.charge_state_hash = {0: "neutral",
+        self.chargeStateHash = {0: "neutral",
                                   1: "charged"
                             }
         self.titratable = copy.deepcopy(titratable)
@@ -44,20 +44,20 @@ class Hybrid:
         self.DeltaDeltaGs = []
         self.DeltaGProteins = []
         self.DeltaGModelCompounds = []
-        self.num_titratable_groups = len(self.titratable.list_of_residues_to_titrate)
-        self.Psi = np.zeros((self.num_titratable_groups, self.num_titratable_groups))
+        self.numTitratableGroups = len(self.titratable.listOfResiduesToTitrate)
+        self.Psi = np.zeros((self.numTitratableGroups, self.numTitratableGroups))
 
 
     def loadGroupChargeDistributions(self, chargeDistributions):
         list_index = 0
         loadedChargeDistributions = copy.deepcopy(chargeDistributions)
-        for residue in self.titratable.list_of_residues_to_titrate:
+        for residue in self.titratable.listOfResiduesToTitrate:
             if residue['group'] not in self.titratable.table.keys():
                 current_residue_info = self.titratable.table['GLOBAL'][residue['group']]
             else:
                 current_residue_info = self.titratable.table[residue['group']][residue['group']]
 
-            for charge_state in self.charge_state_hash.keys():
+            for charge_state in self.chargeStateHash.keys():
                 loadedChargeDistributions[list_index][charge_state]['q']=self.loadSingleChargeDistribution(loadedChargeDistributions[list_index][charge_state]['q'])
             list_index = list_index+1
 
@@ -108,14 +108,14 @@ class Hybrid:
         loadedPotentialFiles = {"protein" : {} ,
                                 "model_compound" : {}
                             }
-        for residue in self.titratable.list_of_residues_to_titrate:
+        for residue in self.titratable.listOfResiduesToTitrate:
             loadedPotentialFiles["protein"][list_index]={}
             if residue['group'] not in self.titratable.table.keys():
                 current_residue_info = self.titratable.table['GLOBAL'][residue['group']]
             else:
                 current_residue_info = self.titratable.table[residue['group']][residue['group']]
 
-            for charge_state in self.charge_state_hash.keys():
+            for charge_state in self.chargeStateHash.keys():
                 loadedPotentialFiles["protein"][list_index][charge_state] = self.loadSinglePotentialFiles(potentialFiles[list_index]["protein"][charge_state][0], potentialFiles[list_index]["protein"][charge_state][1])
                 
                 
@@ -126,7 +126,7 @@ class Hybrid:
 
     def calculateDeltaGModelCompounds(self):
         list_index = 0
-        for residue in self.titratable.list_of_residues_to_titrate:
+        for residue in self.titratable.listOfResiduesToTitrate:
             if residue['group'] not in self.titratable.table.keys():
                 current_residue_info = self.titratable.table['GLOBAL'][residue['group']]
             else:
@@ -139,7 +139,7 @@ class Hybrid:
     
     def calculateDeltaGProteins(self):
         list_index = 0
-        for residue in self.titratable.list_of_residues_to_titrate:
+        for residue in self.titratable.listOfResiduesToTitrate:
             if residue['group'] not in self.titratable.table.keys():
                 current_residue_info = self.titratable.table['GLOBAL'][residue['group']]
             else:
@@ -160,7 +160,7 @@ class Hybrid:
         self.calculateDeltaGModelCompounds()
 
         list_index = 0
-        for residue in self.titratable.list_of_residues_to_titrate:
+        for residue in self.titratable.listOfResiduesToTitrate:
             if residue['group'] not in self.titratable.table.keys():
                 current_residue_info = self.titratable.table['GLOBAL'][residue['group']]
             else:
@@ -180,13 +180,13 @@ class Hybrid:
         print("APBS output = " + str(self.neutralSolvationEnergy))
 
         list_index = 0
-        for residue in self.titratable.list_of_residues_to_titrate:
+        for residue in self.titratable.listOfResiduesToTitrate:
             if residue['group'] not in self.titratable.table.keys():
                 current_residue_info = self.titratable.table['GLOBAL'][residue['group']]
             else:
                 current_residue_info = self.titratable.table[residue['group']][residue['group']]
 
-            for charge_state in self.charge_state_hash.keys():
+            for charge_state in self.chargeStateHash.keys():
                 explicit_free_energy = 0.5 * self.kbT_per_e_To_kJ_per_mol * np.inner(self.proteinPotentials["protein"][list_index][charge_state], self.proteinChargeDistributions[list_index][charge_state]['q'])
                 print("0.5 * phi^T * q = " + str(explicit_free_energy))
                 print("APBS output = " + str(self.proteinSolvationEnergies[list_index]["protein"][charge_state]))
@@ -200,10 +200,10 @@ class Hybrid:
         self.calculateDeltaDeltaGs()
         self.calculatePsiValues()
         list_index = 0
-        #num_titratable_groups = len(self.titrationDetails.list_of_residues_to_titrate)
-        input_file.write(str(self.num_titratable_groups)+"\n")
+        #numTitratableGroups = len(self.titrationDetails.listOfResiduesToTitrate)
+        input_file.write(str(self.numTitratableGroups)+"\n")
 
-        for residue in self.titratable.list_of_residues_to_titrate:
+        for residue in self.titratable.listOfResiduesToTitrate:
             if residue['group'] not in self.titratable.table.keys():
                 current_residue_info = self.titratable.table['GLOBAL'][residue['group']]
             else:
@@ -219,22 +219,23 @@ class Hybrid:
 
             
             Psi_list = []
-            for j in range(list_index+1,self.num_titratable_groups):
+            for j in range(list_index+1,self.numTitratableGroups):
                 Psi_i_j = self.Psi[list_index][j] * self.kJ_per_mol_To_kcal_per_mol #"("+str(list_index+1)+", "+str(j)+")"
+                input_file.write(str(Psi_i_j)+"\n")
                 Psi_list.append(Psi_i_j)
                 
-            input_file.write("  ".join([str(x) for x in Psi_list])+"\n")
+#            input_file.write("  ".join([str(x) for x in Psi_list])+"\n")
             list_index = list_index+1
                 
         input_file.close()
 
     def calculatePsiValues(self):
-        #num_titratable_groups = len(self.titrationDetails.list_of_residues_to_titrate)
-        #self.Psi = np.zeros((num_titratable_groups, num_titratable_groups))
+        #numTitratableGroups = len(self.titrationDetails.listOfResiduesToTitrate)
+        #self.Psi = np.zeros((numTitratableGroups, numTitratableGroups))
         list_index = 0
 
         
-        for residue in self.titratable.list_of_residues_to_titrate:
+        for residue in self.titratable.listOfResiduesToTitrate:
             if residue['group'] not in self.titratable.table.keys():
                 current_residue_info = self.titratable.table['GLOBAL'][residue['group']]
             else:
@@ -243,9 +244,9 @@ class Hybrid:
             gamma_i = float(current_residue_info['gamma'])
             delta_q =  self.proteinChargeDistributions[list_index][1]['q']-self.proteinChargeDistributions[list_index][0]['q']
                 
-            for j in range(list_index+1, self.num_titratable_groups):
+            for j in range(list_index+1, self.numTitratableGroups):
                 print("doing (" + str(list_index) + ", " + str(j) + ")")
-                residue_j = self.titratable.list_of_residues_to_titrate[j]
+                residue_j = self.titratable.listOfResiduesToTitrate[j]
                 if residue_j['group'] not in self.titratable.table.keys():
                     current_residue_j_info = self.titratable.table['GLOBAL'][residue_j['group']]
                 else:

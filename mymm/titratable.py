@@ -45,6 +45,9 @@ class Titratable:
         self.listOfResiduesToTitrate = []
         if filename is not None:
             self.readTitratableGroupDefinitions(filename)
+        self.chargeStateHash = {0: "neutral",
+                                  1: "charged"
+                            }
 
     def readTitratableGroupDefinitions(self, filename):
         '''
