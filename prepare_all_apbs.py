@@ -11,6 +11,7 @@ parser.add_argument("--titration_list",nargs=1, help="file listing the groups to
 parser.add_argument("--topology", nargs=1, help="CHARMM style topology file--use a PARSE_prot_patch file")
 parser.add_argument("--radii", nargs=1, help="radii.siz file")
 parser.add_argument("--patchfile", nargs=1, help="file listing key patches")
+args = parser.parse_args()
 
 #args = parser.parse_args('--pdb arg_capped_nter_cter_PARSE.pdb --psf arg_capped_nter_cter_PARSE.psf --titratables_def ../titratable_PARSE.def --titration_list titration_list.txt --topology /home/bard415/repos/60376-testset1/top_PARSE_prot_patch.inp --radii /home/bard415/repos/parameters/radii_fixNH3.siz --patchfile /home/bard415/repos/60376-testset1/testing-writing-subdirs/patchfile'.split())
 
