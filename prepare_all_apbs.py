@@ -37,15 +37,20 @@ table.readTitrationList(filename=args.titration_list[0])
 table.printTitrationList()
 table.validateTitrationListAgainstMolecule(system)
 
+[proteinBoxSize,origin] = system.get_box_info()
+scaleFactorCG = 4
+scaleFactorFG = 2
+cglenParam = [scaleFactorCG * x for x in proteinBoxSize]
+fglenParam = [scaleFactorFG * x for x in proteinBoxSize]
 
 protein = mymm.Apbs()
 protein.headerComment = "Junk test APBS input"
 base_dir = os.getcwd()
-protein_params_hash =  {'dime': 33,
-                        'cglen': [40, 40, 40],
-                        'fglen': [20, 20, 20],
+protein_params_hash =  {'dime': 129,
+                        'cglen': cglenParam,
+                        'fglen': fglenParam,
                         'fgcent': 2,
-                        'cgcent':2}
+                        'cgcent': 2}
 protein.addAnalysisSection(["print elecEnergy solv - ref end"])
 protein.addElecSection(name="solv", molIndex=1, commands = "write atompot flat solv", additionalParamsDict=protein_params_hash)
 protein_params_hash.update({'sdie':protein.elecParams['pdie']})

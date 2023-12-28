@@ -42,9 +42,9 @@ protein = mymm.Apbs()
       
 protein.headerComment = "Junk test APBS input"
 base_dir = os.getcwd()
-protein_params_hash =  {'dime': 33,
-                        'cglen': [40, 40, 40],
-                        'fglen': [20, 20, 20],
+protein_params_hash =  {'dime': 129,
+                        'cglen': [80, 80, 80],
+                        'fglen': [40, 40, 40],
                         'fgcent': 2,
                         'cgcent': 2}
 protein.addAnalysisSection(["print elecEnergy solv - ref end"])
