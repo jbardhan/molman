@@ -85,11 +85,12 @@ totalNumTitrationStates = 2**numTitrationSites
 for i in range(totalNumTitrationStates):
     print(f"Doing state {i} with {numTitrationSites} sites")
     # convert i to binary string and then list
-    binaryString = format(bin(i),'0'+str(numTitrationSites+2))
-    print("binary string is " + str(binaryString))
+    binaryString = format(i,"#0"+str(numTitrationSites+2)+"b")
+    #print("binary string is " + str(binaryString))
     chargeStateList = list(binaryString)
     chargeStateList = chargeStateList[2:]
-    print("chargeStateList = " + str([str(x) for x in chargeStateList]))
+    chargeStateList.reverse()
+    #print("chargeStateList = " + str([str(x) for x in chargeStateList]))
     # create directory and change to it
     exhaustiveIndexDir = "exhaustive_" + str(i)
     #sys.exit(0)
@@ -104,6 +105,9 @@ for i in range(totalNumTitrationStates):
         print("chargeStateList[j_index] = " + str(chargeStateList[j_index]))
         system.set_titratable_group_charges(table, residue, state=charge_state_hash[int(chargeStateList[j_index])])
         j_index=j_index+1
+    
+    if i==2:
+        sys.exit(0)
 
     # assign radii and write crg, apbsPqr, apbsInput file
     system.assign_radii(systemRadii, systemPatches)
